@@ -1,3 +1,4 @@
 ticker,shares,entry_date,target_exit,est_entry,stop_price,order_id,status,discount_pct,institution
 DD,109,2026-06-10,2026-06-15,45.63,44.26,5,open,62.6,STATE STREET CORP
 ADBE,21,2026-06-10,2026-06-15,234.15,227.13,5,open,55.8,"BLACKROCK, INC."
+NKE,111,2026-06-11,2026-06-16,44.71,43.37,5,open,52.7,VAN ECK ASSOCIATES CORP
