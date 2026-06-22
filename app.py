@@ -404,9 +404,9 @@ def update_table(strategy_filter, n):
     if df_all.empty:
         return html.P('No trades for selected strategy.', style={'color': '#8b949e'})
 
-    # Base columns always shown
+    # Base columns always shown — include status so we can style by it
     base_cols = ['date', 'strategy', 'symbol', 'direction', 'shares',
-                 'est_entry', 'stop', 'tp', 'dollar_pnl']
+                 'est_entry', 'stop', 'tp', 'dollar_pnl', 'status']
 
     # Add strategy-specific signal columns when filtering to one strategy
     extra = []
@@ -445,10 +445,18 @@ def update_table(strategy_filter, n):
             'padding': '8px', 'textAlign': 'center',
         },
         style_data_conditional=[
-            {'if': {'filter_query': '{Dollar Pnl} contains "+"'}, 'color': '#2ecc71'},
-            {'if': {'filter_query': '{Dollar Pnl} contains "-"'}, 'color': '#e74c3c'},
-            {'if': {'filter_query': '{Direction} = "LONG"'},      'color': '#2ecc71'},
-            {'if': {'filter_query': '{Direction} = "SHORT"'},     'color': '#e74c3c'},
+            # Closed / cancelled rows — dim everything to grey first
+            {'if': {'filter_query': '{Status} = "closed" || {Status} = "cancelled" || {Status} = "closed_pending"'},
+             'color': '#555e6b', 'backgroundColor': '#0d1117'},
+            # Open rows — colour by direction
+            {'if': {'filter_query': '{Status} = "open" && {Direction} = "LONG"'},  'color': '#2ecc71'},
+            {'if': {'filter_query': '{Status} = "open" && {Direction} = "SHORT"'}, 'color': '#e74c3c'},
+            # PnL colouring (takes precedence for the PnL cell on closed rows)
+            {'if': {'filter_query': '{Dollar Pnl} contains "+"', 'column_id': 'Dollar Pnl'}, 'color': '#2ecc71'},
+            {'if': {'filter_query': '{Dollar Pnl} contains "-"', 'column_id': 'Dollar Pnl'}, 'color': '#e74c3c'},
+            # Highlight status badge
+            {'if': {'filter_query': '{Status} = "open"',   'column_id': 'Status'}, 'color': '#f59e0b', 'fontWeight': 'bold'},
+            {'if': {'filter_query': '{Status} = "closed"', 'column_id': 'Status'}, 'color': '#555e6b'},
         ],
         page_size=25,
         sort_action='native',
