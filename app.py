@@ -10,6 +10,7 @@ import os
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import dash
 from dash import dcc, html, dash_table, Input, Output
 import plotly.graph_objects as go
@@ -17,6 +18,7 @@ from plotly.subplots import make_subplots
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+LIVE_MARKS_FILE = os.path.join(DATA_DIR, 'live_marks.csv')
 
 STRATEGIES = {
     'AEARN-MOMO-001'  : {'file': 'aearn_trades.csv',   'color': '#2ecc71', 'capital': 10000},
@@ -114,6 +116,27 @@ def equity_curve(df, capital=10000):
     return df['date'].tolist(), (capital + np.cumsum(pnl)).tolist()
 
 
+def load_live_marks():
+    """
+    Load the unrealized-P&L snapshot written by sync_live_marks.py.
+
+    This is a periodic snapshot (every ~15 min during market hours), not a
+    live feed -- the dashboard runs on Render and can't reach the local IBKR
+    Gateway directly. Returns (DataFrame, latest 'as_of' timestamp or None).
+    """
+    if not os.path.exists(LIVE_MARKS_FILE):
+        return pd.DataFrame(), None
+    try:
+        df = pd.read_csv(LIVE_MARKS_FILE)
+        if df.empty:
+            return df, None
+        df['as_of'] = pd.to_datetime(df['as_of'], errors='coerce')
+        latest = df['as_of'].max()
+        return df, latest
+    except Exception:
+        return pd.DataFrame(), None
+
+
 # ── APP ───────────────────────────────────────────────────────────────────────
 app = dash.Dash(__name__, title='AlphaX Dashboard')
 server = app.server  # for Render/gunicorn
@@ -141,6 +164,7 @@ app.layout = html.Div(
             html.P('9 Strategies  ·  IBKR Paper Account DU7922803',
                    style={'color': '#8b949e', 'fontSize': '13px', 'marginBottom': '3px'}),
             html.P(id='last-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
+            html.P(id='marks-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
         ]),
 
         # ── Strategy Cards (row 1: original 3, row 2: new 2) ─────────────────
@@ -205,6 +229,7 @@ app.layout = html.Div(
 # ── CALLBACKS ─────────────────────────────────────────────────────────────────
 @app.callback(
     Output('last-updated',   'children'),
+    Output('marks-updated',  'children'),
     Output('cards-row1',     'children'),
     Output('cards-row2',     'children'),
     Output('cards-row3',     'children'),
@@ -219,11 +244,28 @@ def update_dashboard(n):
     now        = datetime.now().strftime('%Y-%m-%d %H:%M SGT')
     all_trades = []
     all_stats  = {}
+    all_unrealized = {}
     cards      = {}
     eq_fig     = go.Figure()
     dd_fig     = go.Figure()
 
     strategy_names = list(STRATEGIES.keys())
+
+    df_marks, marks_as_of = load_live_marks()
+
+    # Unrealized P&L snapshot is periodic (see sync_live_marks.py docstring),
+    # not real-time -- surface how stale it is so a missed sync is obvious
+    # rather than silently showing outdated numbers as if they were current.
+    if marks_as_of is None:
+        marks_text = 'Unrealized P&L: no live marks snapshot found yet.'
+    else:
+        # sync_live_marks.py writes 'as_of' in US Eastern Time (now_et()) --
+        # compare against ET "now" here too, not server-local time (SGT
+        # locally, UTC on Render), which would silently give a bogus offset.
+        now_et_naive = datetime.now(ZoneInfo('America/New_York')).replace(tzinfo=None)
+        age_min = (now_et_naive - marks_as_of.to_pydatetime().replace(tzinfo=None)).total_seconds() / 60
+        staleness = ' ⚠️ STALE' if age_min > 45 else ''
+        marks_text = f'Unrealized P&L as of: {marks_as_of.strftime("%Y-%m-%d %H:%M")} ET{staleness}'
 
     for name, cfg in STRATEGIES.items():
         filepath = os.path.join(DATA_DIR, cfg['file'])
@@ -233,7 +275,13 @@ def update_dashboard(n):
         capital  = cfg['capital']
         all_stats[name] = stats
 
-        pnl_color = '#2ecc71' if stats['total_pnl'] >= 0 else '#e74c3c'
+        unrealized = 0.0
+        if not df_marks.empty:
+            unrealized = float(df_marks.loc[df_marks['strategy'] == name, 'unrealized_pnl'].sum())
+        all_unrealized[name] = unrealized
+
+        pnl_color   = '#2ecc71' if stats['total_pnl'] >= 0 else '#e74c3c'
+        unreal_color = '#2ecc71' if unrealized >= 0 else '#e74c3c'
 
         # ── Strategy stat card ──────────────────────────────────────────────
         card = html.Div(style={
@@ -244,9 +292,12 @@ def update_dashboard(n):
                                  'fontSize': '13px', 'fontWeight': 'bold'}),
             html.Div(style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr',
                             'gap': '8px'}, children=[
-                html.Div([html.Span('P&L', style={'color': '#8b949e', 'fontSize': '11px'}),
+                html.Div([html.Span('Realized P&L', style={'color': '#8b949e', 'fontSize': '11px'}),
                           html.P(f'${stats["total_pnl"]:+,.2f}',
                                  style={'color': pnl_color, 'margin': '2px 0', 'fontWeight': 'bold'})]),
+                html.Div([html.Span('Unrealized P&L', style={'color': '#8b949e', 'fontSize': '11px'}),
+                          html.P(f'${unrealized:+,.2f}',
+                                 style={'color': unreal_color, 'margin': '2px 0', 'fontWeight': 'bold'})]),
                 html.Div([html.Span('Return', style={'color': '#8b949e', 'fontSize': '11px'}),
                           html.P(f'{stats["total_return"]:+.2f}%',
                                  style={'color': pnl_color, 'margin': '2px 0'})]),
@@ -266,17 +317,26 @@ def update_dashboard(n):
         # ── Equity curve ────────────────────────────────────────────────────
         dates, eq = equity_curve(df, capital)
         if dates:
+            # Append the live mark as one extra point so open exposure shows
+            # up on the curve instead of the line stopping at the last close.
+            plot_dates, plot_eq = list(dates), list(eq)
+            if marks_as_of is not None:
+                plot_dates.append(marks_as_of)
+                plot_eq.append(eq[-1] + unrealized)
+
             eq_fig.add_trace(go.Scatter(
-                x=dates, y=eq, name=name,
+                x=plot_dates, y=plot_eq, name=name,
                 line=dict(color=color, width=2),
                 hovertemplate='%{x}<br>$%{y:,.2f}<extra>' + name + '</extra>'
             ))
             pnl_arr = pd.to_numeric(df['dollar_pnl'], errors='coerce').fillna(0).values
             cum     = np.cumsum(pnl_arr)
+            if marks_as_of is not None:
+                cum = np.append(cum, cum[-1] + unrealized)
             peak    = np.maximum.accumulate(cum)
             dd_arr  = cum - peak
             dd_fig.add_trace(go.Scatter(
-                x=dates, y=dd_arr.tolist(), name=name,
+                x=plot_dates, y=dd_arr.tolist(), name=name,
                 fill='tozeroy', line=dict(color=color, width=1),
                 hovertemplate='%{x}<br>$%{y:,.2f}<extra>' + name + '</extra>'
             ))
@@ -300,6 +360,7 @@ def update_dashboard(n):
 
     # ── Combined card ────────────────────────────────────────────────────────
     combined_card = html.Div()
+    total_unrealized = sum(all_unrealized.values())
     if all_trades:
         df_all       = pd.concat(all_trades, ignore_index=True)
         total_pnl    = pd.to_numeric(df_all.get('dollar_pnl', pd.Series()), errors='coerce').fillna(0).sum()
@@ -307,6 +368,7 @@ def update_dashboard(n):
         pnl_arr      = pd.to_numeric(df_all.get('dollar_pnl', pd.Series()), errors='coerce').dropna()
         win_rate     = round((pnl_arr > 0).mean() * 100, 1) if len(pnl_arr) > 0 else 0
         pnl_color    = '#2ecc71' if total_pnl >= 0 else '#e74c3c'
+        unreal_color = '#2ecc71' if total_unrealized >= 0 else '#e74c3c'
 
         combined_card = html.Div(style={
             'backgroundColor': '#161b22', 'borderRadius': '10px', 'padding': '20px',
@@ -315,8 +377,10 @@ def update_dashboard(n):
         }, children=[
             html.H4('📊 PORTFOLIO COMBINED',
                     style={'color': '#58a6ff', 'width': '100%', 'margin': '0 0 10px 0'}),
-            html.Div([html.Span('Total P&L',    style={'color': '#8b949e', 'fontSize': '12px'}),
+            html.Div([html.Span('Realized P&L',    style={'color': '#8b949e', 'fontSize': '12px'}),
                       html.H3(f'${total_pnl:+,.2f}', style={'color': pnl_color, 'margin': '2px 0'})]),
+            html.Div([html.Span('Unrealized P&L',  style={'color': '#8b949e', 'fontSize': '12px'}),
+                      html.H3(f'${total_unrealized:+,.2f}', style={'color': unreal_color, 'margin': '2px 0'})]),
             html.Div([html.Span('Total Trades', style={'color': '#8b949e', 'fontSize': '12px'}),
                       html.H3(str(total_trades),      style={'margin': '2px 0'})]),
             html.Div([html.Span('Win Rate',     style={'color': '#8b949e', 'fontSize': '12px'}),
@@ -367,6 +431,7 @@ def update_dashboard(n):
 
     return (
         f'Last updated: {now}',
+        marks_text,
         row1,
         row2,
         row3,
