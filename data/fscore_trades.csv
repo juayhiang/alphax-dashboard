@@ -1,1 +1,6 @@
-ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,score
+ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,score,exit_date,exit_price,dollar_pnl
+MU,9,2026-07-02,2026-07-23,1013.62,932.42,1336289103,open,8,,,
+LRCX,24,2026-07-02,2026-07-23,384.05,353.00,1336289068,open,8,,,
+CAT,9,2026-07-02,2026-07-23,980.12,901.60,1336289087,open,8,,,
+PANW,28,2026-07-02,2026-07-23,350.69,325.68,1336289060,open,8,,,
+AMAT,14,2026-07-02,2026-07-23,650.71,599.84,1336289093,closed,8,2026-07-02,599.50,-716.94
