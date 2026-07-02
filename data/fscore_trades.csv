@@ -1,6 +1,1 @@
 ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,score
-MU,9,2026-07-01,2026-07-22,1078.67,992.38,5,pending_open,8
-LRCX,24,2026-07-01,2026-07-22,412.57,379.56,9,pending_open,8
-AMAT,14,2026-07-01,2026-07-22,690.13,634.92,13,pending_open,8
-CAT,9,2026-07-01,2026-07-22,1031.0,948.52,17,pending_open,8
-PANW,28,2026-07-01,2026-07-22,345.98,318.3,21,pending_open,8
