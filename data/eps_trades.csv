@@ -1,1 +1,3 @@
-ticker,shares,entry_date,target_exit,est_entry,tp,order_id,status,score
+ticker,shares,entry_date,target_exit,est_entry,tp,order_id,status,score,exit_date,exit_price,dollar_pnl,stop
+NKE,231,2026-07-02,2026-08-01,43.23,44.96,5,cancelled,16.0394,2026-07-07,,0.0,41.5
+GS,8,2026-07-15,2026-08-14,1141.5,1187.16,155,pending_open,123.0932,,,,
