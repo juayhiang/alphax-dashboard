@@ -1,1 +1,2 @@
 ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,exit_date,exit_price,dollar_pnl
+CNP,231,2026-07-20,2026-07-27,43.13,40.54,249,pending_open,,,
