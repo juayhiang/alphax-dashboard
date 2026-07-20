@@ -1,3 +1,4 @@
-ticker,shares,entry_date,target_exit,est_entry,tp,order_id,status,score,exit_date,exit_price,dollar_pnl
-GS,8,2026-07-15,2026-08-14,1141.5,1187.16,155,closed,123.0932,2026-07-16,1095.69,-426.77
-UNH,23,2026-07-17,2026-08-16,426.5,443.56,220,pending_open,37.8295
+ticker,shares,entry_date,target_exit,est_entry,tp,order_id,status,score,exit_date,exit_price,dollar_pnl,stop
+GS,8,2026-07-15,2026-08-14,1149.03625,1187.16,155,closed,123.0932,2026-07-16,1095.69,-426.77,1095.84
+NKE,231,2026-07-02,2026-08-01,43.23,44.96,5,cancelled,16.0394,2026-07-07,,0.0,41.5
+UNH,23,2026-07-17,2026-08-16,429.7374,443.56,220,open,37.8295,,,,412.55
