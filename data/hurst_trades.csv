@@ -1,2 +1,2 @@
 ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,hurst,regime
-PYPL,178,2026-07-20,2026-07-30,56.1,53.3,255,pending_open,0.6664,trending
+PYPL,178,2026-07-20,2026-07-30,56.5961,53.3,255,open,0.6664,trending
