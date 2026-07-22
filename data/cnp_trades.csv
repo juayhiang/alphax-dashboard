@@ -1,2 +1,2 @@
-date,symbol,direction,shares,est_entry,stop,exit_target_date,today_premium,pctile_thresh,order_id
-2026-07-20,CNP,LONG,231,43.13,40.54,2026-07-27,49567534.749600016,48662503.817405,249
+ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,today_premium,pctile_thresh,exit_date,exit_price,dollar_pnl
+CNP,231,2026-07-20,2026-07-27,43.5055,40.54,249,open,49567534.749600016,48662503.817405,,,
