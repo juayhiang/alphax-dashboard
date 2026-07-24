@@ -1,1 +1,3 @@
-ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,source,reaction_pct,expected_pct
+ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,source
+ACN,SHORT,75,2026-06-18,2026-06-19,133.24,143.9,106.59,5,cancelled,premarket
+CHTR,SHORT,90,2026-07-24,2026-07-25,110.11,118.92,88.09,338,pending_open,premarket
