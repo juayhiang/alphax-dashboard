@@ -1,1 +1,3 @@
 ticker,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
+AMD,19,2026-07-24,2026-08-03,522.6,496.47,616.67,362,pending_open,,,
+APH,65,2026-07-24,2026-08-03,152.88,145.24,180.4,367,pending_open,,,
