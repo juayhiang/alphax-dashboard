@@ -1,2 +1,2 @@
-ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,exit_date,exit_price,dollar_pnl
-CNP,231,2026-07-20,2026-07-27,43.5055,40.54,249,closed_pending,,,
+ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,today_premium,pctile_thresh,exit_date,exit_price,dollar_pnl
+CNP,231,2026-07-20,2026-07-27,43.5055,40.54,249,closed,49567534.749600016,48662503.817405,2026-07-27,43.9318,98.48
