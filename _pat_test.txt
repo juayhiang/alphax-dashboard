@@ -1,1 +1,0 @@
-PAT rotation end-to-end test — 2026-07-29T06:01:22Z UTC — safe to delete
