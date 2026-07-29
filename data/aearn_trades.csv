@@ -1,3 +1,3 @@
-ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status
-F,LONG,638,2026-07-29,2026-08-03,15.67,14.1,18.8,5,pending_open
-CSGP,SHORT,383,2026-07-29,2026-08-03,26.05,28.66,20.84,10,pending_open
+ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
+F,LONG,638,2026-07-29,2026-08-03,15.67,14.1,18.8,5,pending_open,,,
+CSGP,SHORT,383,2026-07-29,2026-08-03,25.86,28.66,20.84,10,open,,,
