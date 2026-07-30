@@ -1,1 +1,2 @@
-ticker,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
+ticker,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status
+ODFL,44,2026-07-30,2026-08-04,222.79,211.65,245.07,485,pending_open
