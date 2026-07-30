@@ -1,4 +1,4 @@
 ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
 F,LONG,638,2026-07-29,2026-08-03,15.6455,14.1,18.8,5,open,,,
 CSGP,SHORT,383,2026-07-29,2026-08-03,25.86,28.66,20.84,10,closed,2026-07-30,26.02,-61.28
-META,SHORT,18,2026-07-30,2026-08-04,534.9,588.39,427.92,485,pending_open,,,
+META,SHORT,18,2026-07-30,2026-08-04,529.09,588.39,427.92,485,open,,,
