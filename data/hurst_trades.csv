@@ -1,7 +1,7 @@
 ticker,shares,entry_date,target_exit,est_entry,stop,order_id,status,hurst,regime,exit_date,dollar_pnl,exit_price
+PYPL,178,2026-07-20,2026-07-30,56.5961,53.3,255,closed_pending,0.6664,trending,,,
 MU,8,2026-06-22,2026-07-02,1199.13,1139.17,5,cancelled,0.7101,trending,2026-06-23,0.0,
 AMAT,15,2026-06-22,2026-07-02,634.47,602.75,9,cancelled,0.6954,trending,2026-06-23,0.0,
 KLAC,37,2026-06-22,2026-07-02,264.0,250.8,13,cancelled,0.6865,trending,2026-06-23,0.0,
 LRCX,25,2026-06-22,2026-07-02,397.84,377.95,17,cancelled,0.7258,trending,2026-06-23,0.0,
 AMD,18,2026-06-22,2026-07-02,544.6,517.37,21,cancelled,0.6539,trending,2026-06-23,0.0,
-PYPL,178,2026-07-20,2026-07-30,56.5961,53.3,255,open,0.6664,trending,,,
