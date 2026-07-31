@@ -61,7 +61,14 @@ def load_trades(filepath):
         # Normalise date column
         if 'entry_date' in df.columns and 'date' not in df.columns:
             df = df.rename(columns={'entry_date': 'date'})
-        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+        # format='mixed': entry_date shows up as both bare "YYYY-MM-DD" and
+        # "YYYY-MM-DD HH:MM:SS" across rows in the same file. Without this,
+        # pandas infers one format from the first rows and silently NaTs
+        # (then drops) any row that doesn't match it -- confirmed real,
+        # 2026-08-01: a closed NOPE-EOD-001/AMD trade vanished from the
+        # dashboard entirely because its entry_date lacked the " 00:00:00"
+        # suffix that earlier rows in the file happened to have.
+        df['date'] = pd.to_datetime(df['date'], errors='coerce', format='mixed')
         df = df.dropna(subset=['date']).sort_values('date').reset_index(drop=True)
 
         # Normalise ticker / symbol
