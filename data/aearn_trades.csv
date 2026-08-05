@@ -1,5 +1,5 @@
 ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
+PLTR,LONG,69,2026-08-04,2026-08-09,144.54,130.32,173.76,653,open,,,
 F,LONG,638,2026-07-29,2026-08-03,15.6455,14.1,18.8,5,closed,2026-08-04,14.91,-469.25
 META,SHORT,18,2026-07-30,2026-08-04,529.09,588.39,427.92,485,closed,2026-08-03,562.24,-596.7
 CSGP,SHORT,383,2026-07-29,2026-08-03,25.86,28.66,20.84,10,closed,2026-07-30,26.02,-61.28
-PLTR,LONG,69,2026-08-04,2026-08-09,144.54,130.32,173.76,653,open,,,
