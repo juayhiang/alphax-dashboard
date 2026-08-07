@@ -1,5 +1,7 @@
 ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,source,exit_date,exit_price,dollar_pnl
-PODD,SHORT,76,2026-08-05,2026-08-06,127.9826,141.2,104.59,711,closed_pending,premarket,,,
+PH,LONG,9,2026-08-06,2026-08-07,1081.1211,994.52,1297.2,756,closed_pending,premarket,,,
+DDOG,SHORT,42,2026-08-06,2026-08-07,227.6787,256.55,190.04,761,closed_pending,premarket,,,
+PODD,SHORT,76,2026-08-05,2026-08-06,127.9826,141.2,104.59,711,closed,premarket,2026-08-07,130.56,-195.88
 NCLH,SHORT,517,2026-07-30,2026-07-31,19.01,20.85,15.45,541,closed,premarket,2026-08-03,18.85,82.72
 GEHC,LONG,144,2026-07-29,2026-07-30,68.4076,63.65,83.03,457,closed,premarket,2026-07-30,71.03,377.63
 ACN,SHORT,75,2026-06-18,2026-06-19,133.24,143.9,106.59,5,cancelled,premarket,,,
@@ -16,6 +18,4 @@ HII,LONG,32,2026-07-30,2026-07-31,312.5,287.5,375.0,536,cancelled,premarket,2026
 ETN,LONG,23,2026-07-31,2026-08-01,419.5,385.94,503.4,595,cancelled,premarket,,,0.0
 CVS,SHORT,103,2026-08-05,2026-08-06,97.0,104.76,77.6,701,cancelled,premarket,,,0.0
 CDW,SHORT,79,2026-08-05,2026-08-06,126.0,136.08,100.8,706,cancelled,premarket,,,0.0
-PH,LONG,9,2026-08-06,2026-08-07,1081.0,994.52,1297.2,756,pending_open,premarket,,,
-DDOG,SHORT,42,2026-08-06,2026-08-07,237.55,256.55,190.04,761,pending_open,premarket,,,
-FISV,SHORT,208,2026-08-06,2026-08-07,47.86,51.69,38.29,766,pending_open,premarket,,,
+FISV,SHORT,208,2026-08-06,2026-08-07,47.86,51.69,38.29,766,cancelled,premarket,2026-08-07,,0.0
