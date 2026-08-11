@@ -1,6 +1,6 @@
 ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,source,exit_date,exit_price,dollar_pnl
 PH,LONG,9,2026-08-06,2026-08-07,1081.1211,994.52,1297.2,756,closed,premarket,2026-08-10,1078.87,-20.26
-DDOG,SHORT,42,2026-08-06,2026-08-07,227.6787,256.55,190.04,761,closed_pending,premarket,,,
+DDOG,SHORT,42,2026-08-06,2026-08-07,227.6787,256.55,190.04,761,closed,premarket,2026-08-11,251.7,-1008.89
 PODD,SHORT,76,2026-08-05,2026-08-06,127.9826,141.2,104.59,711,closed,premarket,2026-08-07,130.56,-195.88
 NCLH,SHORT,517,2026-07-30,2026-07-31,19.01,20.85,15.45,541,closed,premarket,2026-08-03,18.85,82.72
 GEHC,LONG,144,2026-07-29,2026-07-30,68.4076,63.65,83.03,457,closed,premarket,2026-07-30,71.03,377.63
