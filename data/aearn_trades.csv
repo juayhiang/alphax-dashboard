@@ -1,5 +1,5 @@
 ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
-PLTR,SHORT,138,2026-08-04,,173.58,190.94,,653,open,,,
+PLTR,SHORT,138,2026-08-04,,173.58,190.94,,653,closed,2026-08-12,176.12,-350.52
 ABNB,LONG,61,2026-08-07,2026-08-12,164.3079,146.7,195.6,778,open,,,
 F,LONG,638,2026-07-29,2026-08-03,15.6455,14.1,18.8,5,closed,2026-08-04,14.91,-469.25
 META,SHORT,18,2026-07-30,2026-08-04,529.09,588.39,427.92,485,closed,2026-08-03,562.24,-596.7
