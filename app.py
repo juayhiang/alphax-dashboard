@@ -8,8 +8,10 @@ Displays live P&L, equity curves, drawdown and trade logs for:
 """
 
 import os
+import io
 import pandas as pd
 import numpy as np
+import requests
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import dash
@@ -20,6 +22,34 @@ from plotly.subplots import make_subplots
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 LIVE_MARKS_FILE = os.path.join(DATA_DIR, 'live_marks.csv')
+
+# Data CSVs are fetched straight from GitHub on every refresh instead of read
+# off local disk. Render only refreshes local disk on a full rebuild+deploy,
+# but data-only commits land every ~15 min (sync_live_marks.py, each bot's
+# own sync_to_dashboard() call) -- redeploying on every single one isn't
+# viable, so local disk silently drifted hours behind GitHub. Confirmed real
+# 2026-08-13: site showed an INST-ACT-AVGDOWN-001/UPS position as 'open'
+# ~8 hours after the bot had already closed it and pushed the close, because
+# no rebuild had happened in between. Fetching from GitHub raw on each
+# dcc.Interval tick means the dashboard reflects the latest commit within
+# one refresh cycle, no deploy required. Falls back to the local (possibly
+# stale) copy only if GitHub itself is unreachable.
+GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/juayhiang/alphax-dashboard/main/data'
+
+
+def _fetch_csv_text(filename):
+    url = f'{GITHUB_RAW_BASE}/{filename}'
+    try:
+        resp = requests.get(url, timeout=5)
+        resp.raise_for_status()
+        return resp.text
+    except Exception as e:
+        print(f'[data] GitHub fetch failed for {filename} ({e}) -- falling back to local copy.')
+        local_path = os.path.join(DATA_DIR, filename)
+        if os.path.exists(local_path):
+            with open(local_path, encoding='utf-8') as f:
+                return f.read()
+        return None
 
 STRATEGIES = {
     'AEARN-MOMO-001'  : {'file': 'aearn_trades.csv',   'color': '#2ecc71', 'capital': 10000},
@@ -46,18 +76,18 @@ EXTRA_COLS = {
 }
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
-def load_trades(filepath):
+def load_trades(csv_text):
     """
-    Load trade CSV safely.
+    Parse a trade CSV (already-fetched text, see _fetch_csv_text) safely.
     Normalises column names across all 5 strategies:
       - entry_date / date  → date
       - ticker / symbol    → symbol
       - NOPE trades have no direction → filled as LONG
     """
-    if not os.path.exists(filepath):
+    if not csv_text:
         return pd.DataFrame()
     try:
-        df = pd.read_csv(filepath)
+        df = pd.read_csv(io.StringIO(csv_text))
         if df.empty:
             return pd.DataFrame()
 
@@ -134,10 +164,11 @@ def load_live_marks():
     live feed -- the dashboard runs on Render and can't reach the local IBKR
     Gateway directly. Returns (DataFrame, latest 'as_of' timestamp or None).
     """
-    if not os.path.exists(LIVE_MARKS_FILE):
+    csv_text = _fetch_csv_text('live_marks.csv')
+    if not csv_text:
         return pd.DataFrame(), None
     try:
-        df = pd.read_csv(LIVE_MARKS_FILE)
+        df = pd.read_csv(io.StringIO(csv_text))
         if df.empty:
             return df, None
         df['as_of'] = pd.to_datetime(df['as_of'], errors='coerce')
@@ -278,8 +309,8 @@ def update_dashboard(n):
         marks_text = f'Unrealized P&L as of: {marks_as_of.strftime("%Y-%m-%d %H:%M")} ET{staleness}'
 
     for name, cfg in STRATEGIES.items():
-        filepath = os.path.join(DATA_DIR, cfg['file'])
-        df       = load_trades(filepath)
+        csv_text = _fetch_csv_text(cfg['file'])
+        df       = load_trades(csv_text)
         stats    = compute_stats(df, cfg['capital'])
         color    = cfg['color']
         capital  = cfg['capital']
@@ -461,8 +492,8 @@ def update_dashboard(n):
 def update_table(strategy_filter, n):
     all_trades = []
     for name, cfg in STRATEGIES.items():
-        filepath = os.path.join(DATA_DIR, cfg['file'])
-        df       = load_trades(filepath)
+        csv_text = _fetch_csv_text(cfg['file'])
+        df       = load_trades(csv_text)
         if not df.empty:
             df['strategy'] = name
             all_trades.append(df)
