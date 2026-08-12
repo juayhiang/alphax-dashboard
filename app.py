@@ -3,7 +3,8 @@ AlphaX Paper Trade Dashboard
 Displays live P&L, equity curves, drawdown and trade logs for:
   AEARN-MOMO-001, CNP-DKPL-V2, ODFL-NETPREM-001,
   NOPE-EOD-001, EARN-B03-001, EPS-BCDC-001,
-  FSCORE-001, HURST-001, INST-ACT-AVGDOWN-001
+  FSCORE-001, HURST-001, INST-ACT-AVGDOWN-001,
+  SPY-NOLOSS-BUTTERFLY, SPY-NOLOSS-IRON-CONDOR
 """
 
 import os
@@ -30,6 +31,8 @@ STRATEGIES = {
     'FSCORE-001'      : {'file': 'fscore_trades.csv',  'color': '#ec4899', 'capital': 10000},
     'HURST-001'            : {'file': 'hurst_trades.csv',        'color': '#84cc16', 'capital': 10000},
     'INST-ACT-AVGDOWN-001' : {'file': 'inst_avgdown_trades.csv', 'color': '#f97316', 'capital':  5000},
+    'SPY-NOLOSS-BUTTERFLY'   : {'file': 'spy_butterfly_trades.csv',     'color': '#22d3ee', 'capital': 10000},
+    'SPY-NOLOSS-IRON-CONDOR' : {'file': 'spy_iron_condor_trades.csv',   'color': '#eab308', 'capital': 10000},
 }
 
 # Columns to show in trade table per strategy (extra signal columns)
@@ -168,7 +171,7 @@ app.layout = html.Div(
         html.Div(style={'textAlign': 'center', 'marginBottom': '30px'}, children=[
             html.H1('🤖 AlphaX Paper Trade Dashboard',
                     style={'color': '#58a6ff', 'marginBottom': '5px'}),
-            html.P('9 Strategies  ·  IBKR Paper Account DU7922803',
+            html.P('11 Strategies  ·  IBKR Paper Account DU7922803',
                    style={'color': '#8b949e', 'fontSize': '13px', 'marginBottom': '3px'}),
             html.P(id='last-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
             html.P(id='marks-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
@@ -352,10 +355,10 @@ def update_dashboard(n):
             df['strategy'] = name
             all_trades.append(df)
 
-    # ── Card rows (3 / 3 / 3) ────────────────────────────────────────────────
-    row1 = [cards[s] for s in strategy_names[:3] if s in cards]
-    row2 = [cards[s] for s in strategy_names[3:6] if s in cards]
-    row3 = [cards[s] for s in strategy_names[6:] if s in cards]
+    # ── Card rows (4 / 4 / 3) ────────────────────────────────────────────────
+    row1 = [cards[s] for s in strategy_names[:4] if s in cards]
+    row2 = [cards[s] for s in strategy_names[4:8] if s in cards]
+    row3 = [cards[s] for s in strategy_names[8:] if s in cards]
 
     # ── Equity chart layout ──────────────────────────────────────────────────
     _dark_layout(eq_fig, yprefix='$')
