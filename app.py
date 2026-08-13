@@ -37,25 +37,32 @@ LIVE_MARKS_FILE = os.path.join(DATA_DIR, 'live_marks.csv')
 GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/juayhiang/alphax-dashboard/main/data'
 
 
-# Last GitHub-fetch outcome, surfaced on the page itself (via the
+# Per-file GitHub-fetch outcome, surfaced on the page itself (via the
 # fetch-status marker below) since Render server logs aren't reachable from
 # here to debug a silent fallback -- e.g. a stale negative-cache entry on
 # whichever GitHub raw CDN edge Render's servers hit, which wouldn't show up
-# testing from a different machine/edge.
-_last_fetch_status = {'ok': None, 'detail': ''}
+# testing from a different machine/edge. Keyed by filename (not a single
+# overwritten last-result) -- a single shared "last" value previously masked
+# an earlier file's failure whenever a later file in the same loop happened
+# to succeed.
+_fetch_status_by_file = {}
 
 
 def _fetch_csv_text(filename):
-    url = f'{GITHUB_RAW_BASE}/{filename}'
+    # Cache-bust: raw.githubusercontent.com sits behind Fastly, which caches
+    # each exact URL for several minutes regardless of how fresh the commit
+    # behind it is -- confirmed real, 2026-08-13: a just-pushed fix took ~5
+    # min to show up. Fastly's cache key includes the query string, so a
+    # unique one on every request forces a fresh fetch from GitHub's origin
+    # every time instead of serving a stale edge copy.
+    url = f'{GITHUB_RAW_BASE}/{filename}?_={datetime.now().timestamp()}'
     try:
-        resp = requests.get(url, timeout=5)
+        resp = requests.get(url, timeout=5, headers={'Cache-Control': 'no-cache'})
         resp.raise_for_status()
-        _last_fetch_status['ok'] = True
-        _last_fetch_status['detail'] = f'{filename}: HTTP {resp.status_code}'
+        _fetch_status_by_file[filename] = f'OK (HTTP {resp.status_code})'
         return resp.text
     except Exception as e:
-        _last_fetch_status['ok'] = False
-        _last_fetch_status['detail'] = f'{filename}: {type(e).__name__}: {e}'
+        _fetch_status_by_file[filename] = f'FAILED ({type(e).__name__}: {e})'
         print(f'[data] GitHub fetch failed for {filename} ({e}) -- falling back to local copy.')
         local_path = os.path.join(DATA_DIR, filename)
         if os.path.exists(local_path):
@@ -492,10 +499,16 @@ def update_dashboard(n):
     _dark_layout(bar_fig, yprefix='$')
     bar_fig.update_layout(showlegend=False, bargap=0.35)
 
-    fetch_status_text = (
-        f'data source: {"github" if _last_fetch_status["ok"] else "LOCAL FALLBACK"} '
-        f'({_last_fetch_status["detail"]})'
-    ) if _last_fetch_status['ok'] is not None else 'data source: (no fetch yet)'
+    failures = {f: s for f, s in _fetch_status_by_file.items() if s.startswith('FAILED')}
+    if not _fetch_status_by_file:
+        fetch_status_text = 'fetch status: (no fetch yet)'
+    elif failures:
+        fetch_status_text = (
+            f'fetch status: {len(failures)}/{len(_fetch_status_by_file)} FAILED -- ' +
+            '; '.join(f'{f}: {s}' for f, s in failures.items())
+        )
+    else:
+        fetch_status_text = f'fetch status: all {len(_fetch_status_by_file)} files OK from github'
 
     return (
         f'Last updated: {now}',
