@@ -30,11 +30,23 @@ LIVE_MARKS_FILE = os.path.join(DATA_DIR, 'live_marks.csv')
 # viable, so local disk silently drifted hours behind GitHub. Confirmed real
 # 2026-08-13: site showed an INST-ACT-AVGDOWN-001/UPS position as 'open'
 # ~8 hours after the bot had already closed it and pushed the close, because
-# no rebuild had happened in between. Fetching from GitHub raw on each
-# dcc.Interval tick means the dashboard reflects the latest commit within
-# one refresh cycle, no deploy required. Falls back to the local (possibly
-# stale) copy only if GitHub itself is unreachable.
-GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/juayhiang/alphax-dashboard/main/data'
+# no rebuild had happened in between.
+#
+# Uses api.github.com's Contents endpoint, NOT raw.githubusercontent.com.
+# raw.githubusercontent.com sits behind a Varnish CDN with a hard 5-minute
+# cache that IGNORES query strings when computing its cache key -- confirmed
+# real 2026-08-13 by inspecting response headers directly: a request with a
+# unique cache-busting `?_=<timestamp>` param still came back `X-Cache: HIT`,
+# identical to a request with no param at all. That "fix" was silently doing
+# nothing the whole time. api.github.com's Contents API caches for only 60s
+# (`Cache-Control: max-age=60`, confirmed via the same header check) and,
+# critically, actually reflects a fresh push when raw.githubusercontent.com
+# was still serving 5-minute-old content in the same test. Unauthenticated
+# rate limit is 60 req/hour -- fine for one person checking in, but add a
+# GITHUB_TOKEN env var in Render (Settings -> Environment) for 5000/hour if
+# this ever needs to support continuous multi-viewer polling.
+GITHUB_API_BASE = 'https://api.github.com/repos/juayhiang/alphax-dashboard/contents/data'
+GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 
 
 # Per-file GitHub-fetch outcome, surfaced on the page itself (via the
@@ -49,15 +61,15 @@ _fetch_status_by_file = {}
 
 
 def _fetch_csv_text(filename):
-    # Cache-bust: raw.githubusercontent.com sits behind Fastly, which caches
-    # each exact URL for several minutes regardless of how fresh the commit
-    # behind it is -- confirmed real, 2026-08-13: a just-pushed fix took ~5
-    # min to show up. Fastly's cache key includes the query string, so a
-    # unique one on every request forces a fresh fetch from GitHub's origin
-    # every time instead of serving a stale edge copy.
-    url = f'{GITHUB_RAW_BASE}/{filename}?_={datetime.now().timestamp()}'
+    url = f'{GITHUB_API_BASE}/{filename}'
+    headers = {
+        'Accept': 'application/vnd.github.raw+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+    }
+    if GITHUB_TOKEN:
+        headers['Authorization'] = f'Bearer {GITHUB_TOKEN}'
     try:
-        resp = requests.get(url, timeout=5, headers={'Cache-Control': 'no-cache'})
+        resp = requests.get(url, timeout=5, headers=headers)
         resp.raise_for_status()
         # For live_marks.csv specifically: capture the raw first line of
         # actual response body received, so a mismatch against what's
@@ -66,8 +78,9 @@ def _fetch_csv_text(filename):
         preview = ''
         if filename == 'live_marks.csv' and resp.text:
             lines = resp.text.splitlines()
-            preview = f' | row1={lines[1][:60] if len(lines) > 1 else "(no data rows)"}'
-        _fetch_status_by_file[filename] = f'OK (HTTP {resp.status_code}){preview}'
+            preview = f' | row1={lines[1][:70] if len(lines) > 1 else "(no data rows)"}'
+        remaining = resp.headers.get('X-RateLimit-Remaining', '?')
+        _fetch_status_by_file[filename] = f'OK (HTTP {resp.status_code}, {remaining} req left this hour){preview}'
         return resp.text
     except Exception as e:
         _fetch_status_by_file[filename] = f'FAILED ({type(e).__name__}: {e})'
