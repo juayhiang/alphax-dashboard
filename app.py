@@ -59,7 +59,15 @@ def _fetch_csv_text(filename):
     try:
         resp = requests.get(url, timeout=5, headers={'Cache-Control': 'no-cache'})
         resp.raise_for_status()
-        _fetch_status_by_file[filename] = f'OK (HTTP {resp.status_code})'
+        # For live_marks.csv specifically: capture the raw first line of
+        # actual response body received, so a mismatch against what's
+        # verified on GitHub directly (e.g. via curl) is visible on the page
+        # itself rather than just trusting "HTTP 200" proves fresh content.
+        preview = ''
+        if filename == 'live_marks.csv' and resp.text:
+            lines = resp.text.splitlines()
+            preview = f' | row1={lines[1][:60] if len(lines) > 1 else "(no data rows)"}'
+        _fetch_status_by_file[filename] = f'OK (HTTP {resp.status_code}){preview}'
         return resp.text
     except Exception as e:
         _fetch_status_by_file[filename] = f'FAILED ({type(e).__name__}: {e})'
@@ -508,7 +516,8 @@ def update_dashboard(n):
             '; '.join(f'{f}: {s}' for f, s in failures.items())
         )
     else:
-        fetch_status_text = f'fetch status: all {len(_fetch_status_by_file)} files OK from github'
+        marks_detail = _fetch_status_by_file.get('live_marks.csv', '')
+        fetch_status_text = f'fetch status: all {len(_fetch_status_by_file)} files OK from github | {marks_detail}'
 
     return (
         f'Last updated: {now}',
