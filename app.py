@@ -229,7 +229,7 @@ app.layout = html.Div(
             # literal, static string baked into the source at deploy time --
             # if the version on the live page doesn't match what's currently
             # committed, the deploy hasn't happened yet, full stop.
-            html.P('build: github-fetch-v2', id='build-marker',
+            html.P('build: github-fetch-v3-cachebust', id='build-marker',
                    style={'color': '#30363d', 'fontSize': '9px', 'marginBottom': '3px'}),
             html.P(id='last-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
             html.P(id='marks-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
