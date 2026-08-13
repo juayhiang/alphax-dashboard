@@ -204,6 +204,14 @@ app.layout = html.Div(
                     style={'color': '#58a6ff', 'marginBottom': '5px'}),
             html.P('11 Strategies  ·  IBKR Paper Account DU7922803',
                    style={'color': '#8b949e', 'fontSize': '13px', 'marginBottom': '3px'}),
+            # Deploy-verification marker -- "Last updated" is computed from
+            # datetime.now() on every callback regardless of which code is
+            # actually running, so it can't prove a deploy landed. This is a
+            # literal, static string baked into the source at deploy time --
+            # if the version on the live page doesn't match what's currently
+            # committed, the deploy hasn't happened yet, full stop.
+            html.P('build: github-fetch-v2', id='build-marker',
+                   style={'color': '#30363d', 'fontSize': '9px', 'marginBottom': '3px'}),
             html.P(id='last-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
             html.P(id='marks-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
         ]),
