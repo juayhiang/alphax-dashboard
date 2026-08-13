@@ -46,6 +46,7 @@ LIVE_MARKS_FILE = os.path.join(DATA_DIR, 'live_marks.csv')
 # GITHUB_TOKEN env var in Render (Settings -> Environment) for 5000/hour if
 # this ever needs to support continuous multi-viewer polling.
 GITHUB_API_BASE = 'https://api.github.com/repos/juayhiang/alphax-dashboard/contents/data'
+GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/juayhiang/alphax-dashboard/main/data'
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 
 
@@ -60,31 +61,69 @@ GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 _fetch_status_by_file = {}
 
 
+def _preview(filename, text):
+    if filename != 'live_marks.csv' or not text:
+        return ''
+    lines = text.splitlines()
+    return f' | row1={lines[1][:70] if len(lines) > 1 else "(no data rows)"}'
+
+
 def _fetch_csv_text(filename):
-    url = f'{GITHUB_API_BASE}/{filename}'
-    headers = {
+    """
+    Three-tier fetch, each tier a safety net for the one before it -- no
+    single failure mode should ever regress below the WORST tier's bound:
+
+      1. api.github.com Contents API -- freshest (60s cache), but
+         unauthenticated calls are capped at 60 req/hour SHARED across
+         every visitor hitting Render's server IP. Confirmed real
+         2026-08-13: this session's own testing alone exhausted the quota
+         within about an hour, and every fetch started 403'ing at once.
+      2. raw.githubusercontent.com -- slower (hard 5-min cache, confirmed
+         via X-Cache: HIT even with cache-busting query params, so treat
+         it as a flat 5-min-stale-worst-case source, nothing more), but
+         NOT rate-limited the same way, so it's a reliable fallback for
+         exactly the failure mode in (1).
+      3. Local disk (baked in at last deploy) -- last resort if GitHub is
+         unreachable entirely.
+
+    Add a GITHUB_TOKEN env var in Render (Settings -> Environment) to raise
+    (1)'s limit to 5000/hour, at which point tier 2 should stop triggering
+    in practice.
+    """
+    api_headers = {
         'Accept': 'application/vnd.github.raw+json',
         'X-GitHub-Api-Version': '2022-11-28',
     }
     if GITHUB_TOKEN:
-        headers['Authorization'] = f'Bearer {GITHUB_TOKEN}'
+        api_headers['Authorization'] = f'Bearer {GITHUB_TOKEN}'
+
     try:
-        resp = requests.get(url, timeout=5, headers=headers)
+        resp = requests.get(f'{GITHUB_API_BASE}/{filename}', timeout=5, headers=api_headers)
         resp.raise_for_status()
-        # For live_marks.csv specifically: capture the raw first line of
-        # actual response body received, so a mismatch against what's
-        # verified on GitHub directly (e.g. via curl) is visible on the page
-        # itself rather than just trusting "HTTP 200" proves fresh content.
-        preview = ''
-        if filename == 'live_marks.csv' and resp.text:
-            lines = resp.text.splitlines()
-            preview = f' | row1={lines[1][:70] if len(lines) > 1 else "(no data rows)"}'
         remaining = resp.headers.get('X-RateLimit-Remaining', '?')
-        _fetch_status_by_file[filename] = f'OK (HTTP {resp.status_code}, {remaining} req left this hour){preview}'
+        _fetch_status_by_file[filename] = (
+            f'OK via api (HTTP {resp.status_code}, {remaining} req left this hour)'
+            f'{_preview(filename, resp.text)}'
+        )
         return resp.text
-    except Exception as e:
-        _fetch_status_by_file[filename] = f'FAILED ({type(e).__name__}: {e})'
-        print(f'[data] GitHub fetch failed for {filename} ({e}) -- falling back to local copy.')
+    except Exception as e_api:
+        # Python 3 deletes exception-clause variables when the clause exits,
+        # so e_api itself can't be referenced past this block -- capture the
+        # message as a plain string now for the combined-failure report below.
+        api_err = f'{type(e_api).__name__}: {e_api}'
+        print(f'[data] api.github.com fetch failed for {filename} ({api_err}) -- trying raw fallback.')
+
+    try:
+        resp = requests.get(f'{GITHUB_RAW_BASE}/{filename}', timeout=5)
+        resp.raise_for_status()
+        _fetch_status_by_file[filename] = (
+            f'OK via raw-fallback (HTTP {resp.status_code}, up to 5min stale)'
+            f'{_preview(filename, resp.text)}'
+        )
+        return resp.text
+    except Exception as e_raw:
+        _fetch_status_by_file[filename] = f'FAILED both api+raw (api: {api_err}; raw: {type(e_raw).__name__}: {e_raw})'
+        print(f'[data] raw.githubusercontent.com fetch also failed for {filename} ({e_raw}) -- falling back to local copy.')
         local_path = os.path.join(DATA_DIR, filename)
         if os.path.exists(local_path):
             with open(local_path, encoding='utf-8') as f:
