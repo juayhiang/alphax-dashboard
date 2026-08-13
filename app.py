@@ -37,13 +37,25 @@ LIVE_MARKS_FILE = os.path.join(DATA_DIR, 'live_marks.csv')
 GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/juayhiang/alphax-dashboard/main/data'
 
 
+# Last GitHub-fetch outcome, surfaced on the page itself (via the
+# fetch-status marker below) since Render server logs aren't reachable from
+# here to debug a silent fallback -- e.g. a stale negative-cache entry on
+# whichever GitHub raw CDN edge Render's servers hit, which wouldn't show up
+# testing from a different machine/edge.
+_last_fetch_status = {'ok': None, 'detail': ''}
+
+
 def _fetch_csv_text(filename):
     url = f'{GITHUB_RAW_BASE}/{filename}'
     try:
         resp = requests.get(url, timeout=5)
         resp.raise_for_status()
+        _last_fetch_status['ok'] = True
+        _last_fetch_status['detail'] = f'{filename}: HTTP {resp.status_code}'
         return resp.text
     except Exception as e:
+        _last_fetch_status['ok'] = False
+        _last_fetch_status['detail'] = f'{filename}: {type(e).__name__}: {e}'
         print(f'[data] GitHub fetch failed for {filename} ({e}) -- falling back to local copy.')
         local_path = os.path.join(DATA_DIR, filename)
         if os.path.exists(local_path):
@@ -214,6 +226,7 @@ app.layout = html.Div(
                    style={'color': '#30363d', 'fontSize': '9px', 'marginBottom': '3px'}),
             html.P(id='last-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
             html.P(id='marks-updated', style={'color': '#8b949e', 'fontSize': '12px'}),
+            html.P(id='fetch-status', style={'color': '#30363d', 'fontSize': '9px'}),
         ]),
 
         # ── Strategy Cards (row 1: original 3, row 2: new 2) ─────────────────
@@ -279,6 +292,7 @@ app.layout = html.Div(
 @app.callback(
     Output('last-updated',   'children'),
     Output('marks-updated',  'children'),
+    Output('fetch-status',   'children'),
     Output('cards-row1',     'children'),
     Output('cards-row2',     'children'),
     Output('cards-row3',     'children'),
@@ -478,9 +492,15 @@ def update_dashboard(n):
     _dark_layout(bar_fig, yprefix='$')
     bar_fig.update_layout(showlegend=False, bargap=0.35)
 
+    fetch_status_text = (
+        f'data source: {"github" if _last_fetch_status["ok"] else "LOCAL FALLBACK"} '
+        f'({_last_fetch_status["detail"]})'
+    ) if _last_fetch_status['ok'] is not None else 'data source: (no fetch yet)'
+
     return (
         f'Last updated: {now}',
         marks_text,
+        fetch_status_text,
         row1,
         row2,
         row3,
