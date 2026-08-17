@@ -9,6 +9,7 @@ Displays live P&L, equity curves, drawdown and trade logs for:
 
 import os
 import io
+import time
 import pandas as pd
 import numpy as np
 import requests
@@ -60,6 +61,20 @@ GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 # to succeed.
 _fetch_status_by_file = {}
 
+# In-process cache shared across every visitor's request (module-level, one
+# gunicorn worker serving everyone) -- filename -> (fetched_at_monotonic, text).
+# Without this, EVERY page load/auto-refresh from EVERY visitor re-ran the
+# full 3-tier fetch below for all 12 files, so total request volume scaled
+# with traffic instead of with time. Confirmed real 2026-08-17: that volume
+# alone was enough to exhaust both the api.github.com tier AND (new that
+# day) get raw.githubusercontent.com itself returning 429s, and the combined
+# fallback latency across 12 files blew past gunicorn's 30s worker timeout,
+# 500ing the whole page for every visitor. Capping real fetches to once per
+# file per TTL, regardless of how many people are looking at the page at
+# once, fixes the volume at its source instead of trying to survive it.
+_CACHE_TTL_SECONDS = 60
+_csv_cache: dict = {}
+
 
 def _preview(filename, text):
     if filename != 'live_marks.csv' or not text:
@@ -69,6 +84,19 @@ def _preview(filename, text):
 
 
 def _fetch_csv_text(filename):
+    """Cache-fronted entry point -- see _fetch_csv_text_uncached for the real fetch."""
+    cached = _csv_cache.get(filename)
+    if cached is not None:
+        fetched_at, text = cached
+        if time.monotonic() - fetched_at < _CACHE_TTL_SECONDS:
+            return text
+
+    text = _fetch_csv_text_uncached(filename)
+    _csv_cache[filename] = (time.monotonic(), text)
+    return text
+
+
+def _fetch_csv_text_uncached(filename):
     """
     Three-tier fetch, each tier a safety net for the one before it -- no
     single failure mode should ever regress below the WORST tier's bound:
