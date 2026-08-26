@@ -1,5 +1,5 @@
 ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
-ROST,LONG,40,2026-08-21,2026-08-26,241.55,223.84,298.45,1119,closed_pending,,,
+ROST,LONG,40,2026-08-21,2026-08-26,241.55,223.84,298.45,1119,closed,2026-08-26,241.19,-14.4
 ABNB,LONG,61,2026-08-07,2026-08-12,164.3079,146.7,195.6,778,closed,2026-08-12,179.52,927.94
 PLTR,SHORT,138,2026-08-04,,173.58,190.94,,653,closed,2026-08-12,176.12,-350.52
 F,LONG,638,2026-07-29,2026-08-03,15.6455,14.1,18.8,5,closed,2026-08-04,14.91,-469.25
