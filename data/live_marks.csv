@@ -1,4 +1,1 @@
 strategy,ticker,direction,shares,est_entry,current_price,unrealized_pnl,as_of
-HURST-001,NOW,LONG,70,142.1,146.47,305.9,2026-09-03 14:30:02
-HURST-001,SLV,LONG,164,60.78,60.53,-41.0,2026-09-03 14:30:02
-NOPE-EOD-001,AVGO,LONG,27,360.6304,355.52,-137.98,2026-09-03 14:30:02
