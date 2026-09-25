@@ -173,6 +173,7 @@ STRATEGIES = {
     # Market-neutral lane (Sep-Oct 2026 challenge): one row per leg / per position-month
     'VMA-PAIRS-001'          : {'file': 'vma_trades.csv',               'color': '#14b8a6', 'capital': 10000},
     'MOM-SP100-001'          : {'file': 'mom_trades.csv',               'color': '#8b5cf6', 'capital': 10000},
+    'VMA-PAIRS-HOURLY'       : {'file': 'vma_hourly_trades.csv',        'color': '#f472b6', 'capital': 10000},
 }
 
 # Columns to show in trade table per strategy (extra signal columns)
@@ -185,6 +186,7 @@ EXTRA_COLS = {
     'INST-ACT-AVGDOWN-001' : ['discount_pct', 'institution'],
     'VMA-PAIRS-001'        : ['z_score', 'hedge_beta', 'exit_reason'],
     'MOM-SP100-001'        : ['role', 'score', 'beta', 'month'],
+    'VMA-PAIRS-HOURLY'     : ['z_score', 'hedge_beta', 'exit_reason'],
 }
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
@@ -314,7 +316,7 @@ app.layout = html.Div(
         html.Div(style={'textAlign': 'center', 'marginBottom': '30px'}, children=[
             html.H1('🤖 AlphaX Paper Trade Dashboard',
                     style={'color': '#58a6ff', 'marginBottom': '5px'}),
-            html.P('13 Strategies  ·  IBKR Paper Account DU7922803',
+            html.P('14 Strategies  ·  IBKR Paper Account DU7922803',
                    style={'color': '#8b949e', 'fontSize': '13px', 'marginBottom': '3px'}),
             # Deploy-verification marker -- "Last updated" is computed from
             # datetime.now() on every callback regardless of which code is
