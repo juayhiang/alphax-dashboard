@@ -230,6 +230,8 @@ def load_trades(csv_text, net=False):
         # NOPE is always LONG — add direction if missing
         if 'direction' not in df.columns:
             df['direction'] = 'LONG'
+        else:   # long-only bots gained the column 2026-09-29; rows they write later may leave it blank
+            df['direction'] = df['direction'].fillna('LONG').replace('', 'LONG')
 
         if not net:
             df = apply_ibkr_costs(df)
