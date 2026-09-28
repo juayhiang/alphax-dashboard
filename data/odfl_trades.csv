@@ -1,4 +1,4 @@
-ticker,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
-ODFL,48,2026-08-20,2026-08-25,208.1927,194.13,224.79,1096,closed,2026-08-25,201.0,-346.57
-ODFL,46,2026-07-31,2026-08-05,214.6837,205.3,237.72,561,closed,2026-08-05,217.02,106.15
-ODFL,44,2026-07-30,2026-08-04,224.5748,211.65,245.07,485,closed,2026-07-30,211.6,-572.2
+ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,exit_date,exit_price,dollar_pnl
+ODFL,LONG,48,2026-08-20,2026-08-25,208.1927,194.13,224.79,1096,closed,2026-08-25,201.0,-346.57
+ODFL,LONG,46,2026-07-31,2026-08-05,214.6837,205.3,237.72,561,closed,2026-08-05,217.02,106.15
+ODFL,LONG,44,2026-07-30,2026-08-04,224.5748,211.65,245.07,485,closed,2026-07-30,211.6,-572.2
