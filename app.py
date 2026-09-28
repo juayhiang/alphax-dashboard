@@ -19,6 +19,7 @@ import dash
 from dash import dcc, html, dash_table, Input, Output
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from ibkr_costs import apply_ibkr_costs
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
@@ -168,13 +169,16 @@ STRATEGIES = {
     'FSCORE-001'      : {'file': 'fscore_trades.csv',  'color': '#ec4899', 'capital': 10000},
     'HURST-001'            : {'file': 'hurst_trades.csv',        'color': '#84cc16', 'capital': 10000},
     'INST-ACT-AVGDOWN-001' : {'file': 'inst_avgdown_trades.csv', 'color': '#f97316', 'capital':  5000},
-    'SPY-NOLOSS-BUTTERFLY'   : {'file': 'spy_butterfly_trades.csv',     'color': '#22d3ee', 'capital': 10000},
-    'SPY-NOLOSS-IRON-CONDOR' : {'file': 'spy_iron_condor_trades.csv',   'color': '#eab308', 'capital': 10000},
+    'SPY-NOLOSS-BUTTERFLY'   : {'file': 'spy_butterfly_trades.csv',     'color': '#22d3ee', 'capital': 10000, 'net': True},
+    'SPY-NOLOSS-IRON-CONDOR' : {'file': 'spy_iron_condor_trades.csv',   'color': '#eab308', 'capital': 10000, 'net': True},
     # Market-neutral lane (Sep-Oct 2026 challenge): one row per leg / per position-month
-    'VMA-PAIRS-001'          : {'file': 'vma_trades.csv',               'color': '#14b8a6', 'capital': 10000},
-    'MOM-SP100-001'          : {'file': 'mom_trades.csv',               'color': '#8b5cf6', 'capital': 10000},
-    'VMA-PAIRS-HOURLY'       : {'file': 'vma_hourly_trades.csv',        'color': '#f472b6', 'capital': 10000},
+    'VMA-PAIRS-001'          : {'file': 'vma_trades.csv',               'color': '#14b8a6', 'capital': 10000, 'net': True},
+    'MOM-SP100-001'          : {'file': 'mom_trades.csv',               'color': '#8b5cf6', 'capital': 10000, 'net': True},
+    'VMA-PAIRS-HOURLY'       : {'file': 'vma_hourly_trades.csv',        'color': '#f472b6', 'capital': 10000, 'net': True},
 }
+
+# 'net': True = the bot's own dollar_pnl already has IBKR's actual commissions taken off (fill commissionReport).
+# Every other strategy is converted to net P&L at load time by ibkr_costs.apply_ibkr_costs().
 
 # Columns to show in trade table per strategy (extra signal columns)
 EXTRA_COLS = {
@@ -190,9 +194,10 @@ EXTRA_COLS = {
 }
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
-def load_trades(csv_text):
+def load_trades(csv_text, net=False):
     """
     Parse a trade CSV (already-fetched text, see _fetch_csv_text) safely.
+    net=False: closed-trade dollar_pnl is converted to NET of IBKR commissions/fees (ibkr_costs.py).
     Normalises column names across all 5 strategies:
       - entry_date / date  → date
       - ticker / symbol    → symbol
@@ -226,6 +231,8 @@ def load_trades(csv_text):
         if 'direction' not in df.columns:
             df['direction'] = 'LONG'
 
+        if not net:
+            df = apply_ibkr_costs(df)
         return df
     except Exception:
         return pd.DataFrame()
@@ -434,7 +441,7 @@ def update_dashboard(n):
 
     for name, cfg in STRATEGIES.items():
         csv_text = _fetch_csv_text(cfg['file'])
-        df       = load_trades(csv_text)
+        df       = load_trades(csv_text, cfg.get('net', False))
         stats    = compute_stats(df, cfg['capital'])
         color    = cfg['color']
         capital  = cfg['capital']
@@ -630,7 +637,7 @@ def update_table(strategy_filter, n):
     all_trades = []
     for name, cfg in STRATEGIES.items():
         csv_text = _fetch_csv_text(cfg['file'])
-        df       = load_trades(csv_text)
+        df       = load_trades(csv_text, cfg.get('net', False))
         if not df.empty:
             df['strategy'] = name
             all_trades.append(df)
@@ -649,7 +656,7 @@ def update_table(strategy_filter, n):
 
     # Base columns always shown — include status so we can style by it
     base_cols = ['date', 'strategy', 'symbol', 'direction', 'shares',
-                 'est_entry', 'stop', 'tp', 'dollar_pnl', 'status']
+                 'est_entry', 'stop', 'tp', 'dollar_pnl', 'ibkr_costs', 'status']
 
     # Add strategy-specific signal columns when filtering to one strategy
     extra = []
@@ -662,6 +669,7 @@ def update_table(strategy_filter, n):
 
     # Format for display
     for col, fmt in [('dollar_pnl', lambda x: f'${x:+,.2f}' if pd.notna(x) else '—'),
+                     ('ibkr_costs', lambda x: f'${x:,.2f}'  if pd.notna(x) else '—'),
                      ('est_entry',  lambda x: f'${x:.2f}'   if pd.notna(x) else '—'),
                      ('stop',       lambda x: f'${x:.2f}'   if pd.notna(x) else '—'),
                      ('tp',         lambda x: f'${x:.2f}'   if pd.notna(x) else '—'),
@@ -672,7 +680,8 @@ def update_table(strategy_filter, n):
         if col in df_show.columns:
             df_show[col] = df_show[col].apply(fmt)
 
-    df_show.columns = [c.replace('_', ' ').title() for c in df_show.columns]
+    df_show = df_show.rename(columns={'dollar_pnl': 'Net P&L', 'ibkr_costs': 'IBKR Costs'})
+    df_show.columns = [c if c in ('Net P&L', 'IBKR Costs') else c.replace('_', ' ').title() for c in df_show.columns]
 
     return dash_table.DataTable(
         data=df_show.to_dict('records'),
