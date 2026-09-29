@@ -173,7 +173,7 @@ STRATEGIES = {
     'SPY-NOLOSS-IRON-CONDOR' : {'file': 'spy_iron_condor_trades.csv',   'color': '#eab308', 'capital': 10000, 'net': True},
     # Market-neutral lane (Sep-Oct 2026 challenge): one row per leg / per position-month
     'VMA-PAIRS-001'          : {'file': 'vma_trades.csv',               'color': '#14b8a6', 'capital': 10000, 'net': True},
-    'MOM-SP100-001'          : {'file': 'mom_trades.csv',               'color': '#8b5cf6', 'capital': 10000, 'net': True},
+    'MOM-SP100-001'          : {'file': 'mom_trades.csv',               'color': '#8b5cf6', 'capital': 50000, 'net': True},
     'VMA-PAIRS-HOURLY'       : {'file': 'vma_hourly_trades.csv',        'color': '#f472b6', 'capital': 10000, 'net': True},
 }
 
