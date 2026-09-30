@@ -1,0 +1,8 @@
+row_id,ticker,direction,role,shares,entry_date,est_entry,exit_date,exit_price,dollar_pnl,status,score,beta,month,entry_commission,prices_estimated
+2026-W40-ORCL,ORCL,SHORT,SHORT,32,2026-09-30,136.75,,,,open,-0.353,2.02,2026-W40,1.2,False
+2026-W40-INTC,INTC,LONG,LONG,38,2026-09-30,117.77,,,,open,2.6004,2.962,2026-W40,1.09,False
+2026-W40-CHTR,CHTR,SHORT,SHORT,39,2026-09-30,112.05,,,,open,-0.4292,0.289,2026-W40,1.2,False
+2026-W40-CAT,CAT,LONG,LONG,5,2026-09-30,828.75,,,,open,0.8662,1.727,2026-W40,1.09,False
+2026-W40-IVV,IVV,SHORT,HEDGE,30,2026-09-30,769.76,,,,open,,5.295,2026-W40,1.61,False
+2026-W40-AMD,AMD,LONG,LONG,7,2026-09-30,610.41,,,,open,1.7857,3.214,2026-W40,1.09,False
+2026-W40-INTU,INTU,SHORT,SHORT,16,2026-09-30,268.97,,,,open,-0.454,0.299,2026-W40,1.19,False
