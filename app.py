@@ -175,6 +175,8 @@ STRATEGIES = {
     'VMA-PAIRS-001'          : {'file': 'vma_trades.csv',               'color': '#14b8a6', 'capital': 10000, 'net': True},
     'MOM-SP100-001'          : {'file': 'mom_trades.csv',               'color': '#8b5cf6', 'capital': 50000, 'net': True},
     'VMA-PAIRS-HOURLY'       : {'file': 'vma_hourly_trades.csv',        'color': '#f472b6', 'capital': 10000, 'net': True},
+    'VMA-H-FUNCTEST-Z05'     : {'file': 'vma_hourly_functest_trades.csv', 'color': '#fb923c', 'capital': 10000, 'net': True},
+    'MOM-FUNCTEST-WEEKLY'    : {'file': 'mom_functest_trades.csv',      'color': '#a3e635', 'capital': 50000, 'net': True},
 }
 
 # 'net': True = the bot's own dollar_pnl already has IBKR's actual commissions taken off (fill commissionReport).
@@ -191,6 +193,8 @@ EXTRA_COLS = {
     'VMA-PAIRS-001'        : ['z_score', 'hedge_beta', 'exit_reason'],
     'MOM-SP100-001'        : ['role', 'score', 'beta', 'month'],
     'VMA-PAIRS-HOURLY'     : ['z_score', 'hedge_beta', 'exit_reason'],
+    'VMA-H-FUNCTEST-Z05'   : ['z_score', 'hedge_beta', 'exit_reason'],
+    'MOM-FUNCTEST-WEEKLY'  : ['role', 'score', 'beta', 'month'],
 }
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
