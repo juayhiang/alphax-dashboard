@@ -161,8 +161,8 @@ def _fetch_csv_text_uncached(filename):
 
 STRATEGIES = {
     'AEARN-MOMO-001'  : {'file': 'aearn_trades.csv',   'color': '#2ecc71', 'capital': 10000},
-    'CNP-DKPL-V2'     : {'file': 'cnp_trades.csv',     'color': '#3498db', 'capital': 10000},
-    'ODFL-NETPREM-001': {'file': 'odfl_trades.csv',    'color': '#e67e22', 'capital': 10000},
+    # 'CNP-DKPL-V2'   : paused + removed from the portfolio 2026-10-01 (no edge; Strategy_Submissions/10_CNP_ODFL)
+    # 'ODFL-NETPREM-001': paused + removed from the portfolio 2026-10-01 (no edge + data bug; see above)
     'NOPE-EOD-001'    : {'file': 'nope_trades.csv',    'color': '#a855f7', 'capital': 10000},
     'EARN-B03-001'    : {'file': 'earn_trades.csv',    'color': '#f59e0b', 'capital': 10000},
     'EPS-BCDC-001'    : {'file': 'eps_trades.csv',     'color': '#06b6d4', 'capital': 10000},
