@@ -179,6 +179,7 @@ STRATEGIES = {
     'VMA-H-FUNCTEST-Z05'     : {'file': 'vma_hourly_functest_trades.csv', 'color': '#fb923c', 'capital': 10000, 'net': True},
     'MOM-FUNCTEST-WEEKLY'    : {'file': 'mom_functest_trades.csv',      'color': '#a3e635', 'capital': 50000, 'net': True},
     'MOM-FUNCTEST-1MIN'      : {'file': 'mom_1min_functest_trades.csv', 'color': '#facc15', 'capital': 50000, 'net': True},
+    'DTC-FUNCTEST-1MIN'      : {'file': 'dtc_1min_functest_trades.csv', 'color': '#fbbf24', 'capital': 50000, 'net': True},
     'VMA-FUNCTEST-1MIN'      : {'file': 'vma_1min_functest_trades.csv', 'color': '#fb7185', 'capital': 10000, 'net': True},
 }
 
@@ -200,6 +201,7 @@ EXTRA_COLS = {
     'VMA-H-FUNCTEST-Z05'   : ['z_score', 'hedge_beta', 'exit_reason'],
     'MOM-FUNCTEST-WEEKLY'  : ['role', 'score', 'beta', 'month'],
     'MOM-FUNCTEST-1MIN'    : ['role', 'score', 'beta', 'commission'],
+    'DTC-FUNCTEST-1MIN'    : ['role', 'score', 'beta', 'commission'],
     'VMA-FUNCTEST-1MIN'    : ['z_score', 'hedge_beta', 'exit_reason'],
 }
 
