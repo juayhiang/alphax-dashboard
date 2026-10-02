@@ -175,11 +175,13 @@ STRATEGIES = {
     'VMA-PAIRS-001'          : {'file': 'vma_trades.csv',               'color': '#14b8a6', 'capital': 10000, 'net': True},
     'MOM-SP100-001'          : {'file': 'mom_trades.csv',               'color': '#8b5cf6', 'capital': 50000, 'net': True},
     'DTC-SP500-001'          : {'file': 'dtc_trades.csv',               'color': '#f97316', 'capital': 50000, 'net': True},
+    'NSI-SP500-001'          : {'file': 'nsi_trades.csv',               'color': '#06b6d4', 'capital': 250000, 'net': True},
     'VMA-PAIRS-HOURLY'       : {'file': 'vma_hourly_trades.csv',        'color': '#f472b6', 'capital': 10000, 'net': True},
     'VMA-H-FUNCTEST-Z05'     : {'file': 'vma_hourly_functest_trades.csv', 'color': '#fb923c', 'capital': 10000, 'net': True},
     'MOM-FUNCTEST-WEEKLY'    : {'file': 'mom_functest_trades.csv',      'color': '#a3e635', 'capital': 50000, 'net': True},
     'MOM-FUNCTEST-1MIN'      : {'file': 'mom_1min_functest_trades.csv', 'color': '#facc15', 'capital': 50000, 'net': True},
     'DTC-FUNCTEST-1MIN'      : {'file': 'dtc_1min_functest_trades.csv', 'color': '#fbbf24', 'capital': 50000, 'net': True},
+    'NSI-FUNCTEST-1MIN'      : {'file': 'nsi_1min_functest_trades.csv', 'color': '#67e8f9', 'capital': 250000, 'net': True},
     'VMA-FUNCTEST-1MIN'      : {'file': 'vma_1min_functest_trades.csv', 'color': '#fb7185', 'capital': 10000, 'net': True},
 }
 
@@ -197,11 +199,13 @@ EXTRA_COLS = {
     'VMA-PAIRS-001'        : ['z_score', 'hedge_beta', 'exit_reason'],
     'MOM-SP100-001'        : ['role', 'score', 'beta', 'month'],
     'DTC-SP500-001'        : ['role', 'score', 'beta', 'month'],
+    'NSI-SP500-001'        : ['role', 'score', 'beta', 'month'],
     'VMA-PAIRS-HOURLY'     : ['z_score', 'hedge_beta', 'exit_reason'],
     'VMA-H-FUNCTEST-Z05'   : ['z_score', 'hedge_beta', 'exit_reason'],
     'MOM-FUNCTEST-WEEKLY'  : ['role', 'score', 'beta', 'month'],
     'MOM-FUNCTEST-1MIN'    : ['role', 'score', 'beta', 'commission'],
     'DTC-FUNCTEST-1MIN'    : ['role', 'score', 'beta', 'commission'],
+    'NSI-FUNCTEST-1MIN'    : ['role', 'score', 'beta', 'commission'],
     'VMA-FUNCTEST-1MIN'    : ['z_score', 'hedge_beta', 'exit_reason'],
 }
 
