@@ -187,6 +187,13 @@ STRATEGIES = {
     'VMA-FUNCTEST-1MIN'      : {'file': 'vma_1min_functest_trades.csv', 'color': '#fb7185', 'capital': 10000, 'net': True},
 }
 
+# Strategy bundles: a submitted strategy made of several bots (no bot of its own). Display only -- a bundle card sums its
+# sleeves' trades, capital and unrealized P&L. Not part of STRATEGIES, so the PORTFOLIO COMBINED card never double counts.
+BUNDLES = {
+    'DTC+OSR PORTFOLIO (Strategy 6)'      : {'parts': ['DTC-SP500-001', 'OSR-SP500-001'],         'color': '#c084fc'},
+    'DTC+OSR PORTFOLIO 1-MIN (Form 6 p.4)': {'parts': ['DTC-FUNCTEST-1MIN', 'OSR-FUNCTEST-1MIN'], 'color': '#e9d5ff'},
+}
+
 # 'net': True = the bot's own dollar_pnl already has IBKR's actual commissions taken off (fill commissionReport).
 # Every other strategy is converted to net P&L at load time by ibkr_costs.apply_ibkr_costs().
 
@@ -371,6 +378,11 @@ app.layout = html.Div(
             html.Div(style={'display': 'flex', 'gap': '15px', 'marginBottom': '15px',
                             'flexWrap': 'wrap'},
                      id='cards-row3'),
+            html.H4('Strategy bundles (sum of their bots -- not added to the portfolio total again)',
+                    style={'color': '#8b949e', 'fontSize': '12px', 'margin': '5px 0 8px 0'}),
+            html.Div(style={'display': 'flex', 'gap': '15px', 'marginBottom': '15px',
+                            'flexWrap': 'wrap'},
+                     id='cards-bundles'),
         ], style={'marginBottom': '10px'}),
 
         # ── Combined Card ─────────────────────────────────────────────────────
@@ -427,6 +439,7 @@ app.layout = html.Div(
     Output('cards-row1',     'children'),
     Output('cards-row2',     'children'),
     Output('cards-row3',     'children'),
+    Output('cards-bundles',  'children'),
     Output('combined-card',  'children'),
     Output('equity-chart',   'figure'),
     Output('drawdown-chart', 'figure'),
@@ -434,11 +447,51 @@ app.layout = html.Div(
     Output('strategy-bar',   'figure'),
     Input('interval',        'n_intervals'),
 )
+def _stat_card(name, color, stats, unrealized, subtitle=None):
+    """One strategy stat card (also used for bundle cards)."""
+    pnl_color   = '#2ecc71' if stats['total_pnl'] >= 0 else '#e74c3c'
+    unreal_color = '#2ecc71' if unrealized >= 0 else '#e74c3c'
+
+    # ── Strategy stat card ──────────────────────────────────────────────
+    card = html.Div(style={
+        **CARD_STYLE_BASE,
+        'borderLeft': f'4px solid {color}',
+    }, children=[
+        html.H4(name, style={'color': color, 'marginBottom': '10px',
+                             'fontSize': '13px', 'fontWeight': 'bold'}),
+        html.Div(style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr',
+                        'gap': '8px'}, children=[
+            html.Div([html.Span('Realized P&L', style={'color': '#8b949e', 'fontSize': '11px'}),
+                      html.P(f'${stats["total_pnl"]:+,.2f}',
+                             style={'color': pnl_color, 'margin': '2px 0', 'fontWeight': 'bold'})]),
+            html.Div([html.Span('Unrealized P&L', style={'color': '#8b949e', 'fontSize': '11px'}),
+                      html.P(f'${unrealized:+,.2f}',
+                             style={'color': unreal_color, 'margin': '2px 0', 'fontWeight': 'bold'})]),
+            html.Div([html.Span('Return', style={'color': '#8b949e', 'fontSize': '11px'}),
+                      html.P(f'{stats["total_return"]:+.2f}%',
+                             style={'color': pnl_color, 'margin': '2px 0'})]),
+            html.Div([html.Span('Sharpe', style={'color': '#8b949e', 'fontSize': '11px'}),
+                      html.P(f'{stats["sharpe"]}', style={'margin': '2px 0'})]),
+            html.Div([html.Span('Max DD', style={'color': '#8b949e', 'fontSize': '11px'}),
+                      html.P(f'${stats["max_dd"]:,.2f}',
+                             style={'color': '#e74c3c', 'margin': '2px 0'})]),
+            html.Div([html.Span('Win Rate', style={'color': '#8b949e', 'fontSize': '11px'}),
+                      html.P(f'{stats["win_rate"]}%', style={'margin': '2px 0'})]),
+            html.Div([html.Span('Trades', style={'color': '#8b949e', 'fontSize': '11px'}),
+                      html.P(f'{stats["n_trades"]}', style={'margin': '2px 0'})]),
+        ]),
+    ])
+    if subtitle:
+        card.children.insert(1, html.P(subtitle, style={'color': '#8b949e', 'fontSize': '10px', 'margin': '-6px 0 8px 0'}))
+    return card
+
+
 def update_dashboard(n):
     now        = datetime.now().strftime('%Y-%m-%d %H:%M SGT')
     all_trades = []
     all_stats  = {}
     all_unrealized = {}
+    strat_dfs  = {}
     cards      = {}
     eq_fig     = go.Figure()
     dd_fig     = go.Figure()
@@ -468,44 +521,14 @@ def update_dashboard(n):
         color    = cfg['color']
         capital  = cfg['capital']
         all_stats[name] = stats
+        strat_dfs[name] = df
 
         unrealized = 0.0
         if not df_marks.empty:
             unrealized = float(df_marks.loc[df_marks['strategy'] == name, 'unrealized_pnl'].sum())
         all_unrealized[name] = unrealized
 
-        pnl_color   = '#2ecc71' if stats['total_pnl'] >= 0 else '#e74c3c'
-        unreal_color = '#2ecc71' if unrealized >= 0 else '#e74c3c'
-
-        # ── Strategy stat card ──────────────────────────────────────────────
-        card = html.Div(style={
-            **CARD_STYLE_BASE,
-            'borderLeft': f'4px solid {color}',
-        }, children=[
-            html.H4(name, style={'color': color, 'marginBottom': '10px',
-                                 'fontSize': '13px', 'fontWeight': 'bold'}),
-            html.Div(style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr',
-                            'gap': '8px'}, children=[
-                html.Div([html.Span('Realized P&L', style={'color': '#8b949e', 'fontSize': '11px'}),
-                          html.P(f'${stats["total_pnl"]:+,.2f}',
-                                 style={'color': pnl_color, 'margin': '2px 0', 'fontWeight': 'bold'})]),
-                html.Div([html.Span('Unrealized P&L', style={'color': '#8b949e', 'fontSize': '11px'}),
-                          html.P(f'${unrealized:+,.2f}',
-                                 style={'color': unreal_color, 'margin': '2px 0', 'fontWeight': 'bold'})]),
-                html.Div([html.Span('Return', style={'color': '#8b949e', 'fontSize': '11px'}),
-                          html.P(f'{stats["total_return"]:+.2f}%',
-                                 style={'color': pnl_color, 'margin': '2px 0'})]),
-                html.Div([html.Span('Sharpe', style={'color': '#8b949e', 'fontSize': '11px'}),
-                          html.P(f'{stats["sharpe"]}', style={'margin': '2px 0'})]),
-                html.Div([html.Span('Max DD', style={'color': '#8b949e', 'fontSize': '11px'}),
-                          html.P(f'${stats["max_dd"]:,.2f}',
-                                 style={'color': '#e74c3c', 'margin': '2px 0'})]),
-                html.Div([html.Span('Win Rate', style={'color': '#8b949e', 'fontSize': '11px'}),
-                          html.P(f'{stats["win_rate"]}%', style={'margin': '2px 0'})]),
-                html.Div([html.Span('Trades', style={'color': '#8b949e', 'fontSize': '11px'}),
-                          html.P(f'{stats["n_trades"]}', style={'margin': '2px 0'})]),
-            ]),
-        ])
+        card = _stat_card(name, color, stats, unrealized)
         cards[name] = card
 
         # ── Equity curve ────────────────────────────────────────────────────
@@ -543,6 +566,19 @@ def update_dashboard(n):
     row1 = [cards[s] for s in strategy_names[:4] if s in cards]
     row2 = [cards[s] for s in strategy_names[4:8] if s in cards]
     row3 = [cards[s] for s in strategy_names[8:] if s in cards]
+
+    # ── Bundle cards (sum of sleeves; display only) ─────────────────────────
+    bundle_cards = []
+    for bname, bcfg in BUNDLES.items():
+        parts = [p for p in bcfg['parts'] if p in STRATEGIES]
+        frames = [strat_dfs[p] for p in parts if not strat_dfs.get(p, pd.DataFrame()).empty]
+        bdf = pd.concat(frames, ignore_index=True).sort_values('date').reset_index(drop=True) if frames else pd.DataFrame()
+        bcap = sum(STRATEGIES[p]['capital'] for p in parts)
+        bstats = compute_stats(bdf, bcap)
+        bunreal = sum(all_unrealized.get(p, 0.0) for p in parts)
+        split = ' + '.join(f"{p} {all_stats[p]['n_trades']}" for p in parts)
+        bundle_cards.append(_stat_card(bname, bcfg['color'], bstats, bunreal,
+                                       subtitle=f'capital ${bcap:,.0f} | trades: {split}'))
 
     # ── Equity chart layout ──────────────────────────────────────────────────
     _dark_layout(eq_fig, yprefix='$')
@@ -642,6 +678,7 @@ def update_dashboard(n):
         row1,
         row2,
         row3,
+        bundle_cards,
         combined_card,
         eq_fig,
         dd_fig,
