@@ -185,6 +185,7 @@ STRATEGIES = {
     'OSR-SP500-001'          : {'file': 'osr_trades.csv',               'color': '#a855f7', 'capital': 250000, 'net': True},
     'OSR-FUNCTEST-1MIN'      : {'file': 'osr_1min_functest_trades.csv', 'color': '#d8b4fe', 'capital': 100000, 'net': True},
     'VMA-FUNCTEST-1MIN'      : {'file': 'vma_1min_functest_trades.csv', 'color': '#fb7185', 'capital': 10000, 'net': True},
+    'NSI-MID-FUNCTEST-1MIN'  : {'file': 'nsi_mid_1min_functest_trades.csv', 'color': '#2dd4bf', 'capital': 50000, 'net': True},
 }
 
 # Strategy bundles: a submitted strategy made of several bots (no bot of its own). Display only -- a bundle card sums its
@@ -217,6 +218,7 @@ EXTRA_COLS = {
     'NSI-FUNCTEST-1MIN'    : ['role', 'score', 'beta', 'commission'],
     'OSR-SP500-001'        : ['role', 'score', 'beta', 'month'],
     'OSR-FUNCTEST-1MIN'    : ['role', 'score', 'beta', 'commission'],
+    'NSI-MID-FUNCTEST-1MIN': ['role', 'score', 'beta', 'commission'],
     'VMA-FUNCTEST-1MIN'    : ['z_score', 'hedge_beta', 'exit_reason'],
 }
 
