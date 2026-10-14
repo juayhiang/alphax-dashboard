@@ -185,6 +185,7 @@ STRATEGIES = {
     'OSR-SP500-001'          : {'file': 'osr_trades.csv',               'color': '#a855f7', 'capital': 250000, 'net': True},
     'OSR-FUNCTEST-1MIN'      : {'file': 'osr_1min_functest_trades.csv', 'color': '#d8b4fe', 'capital': 100000, 'net': True},
     'VMA-FUNCTEST-1MIN'      : {'file': 'vma_1min_functest_trades.csv', 'color': '#fb7185', 'capital': 10000, 'net': True},
+    'MOM-SP100-V2'           : {'file': 'mom_v2_trades.csv',             'color': '#c4b5fd', 'capital': 50000, 'net': True},
     'NSI-MID-FUNCTEST-1MIN'  : {'file': 'nsi_mid_1min_functest_trades.csv', 'color': '#2dd4bf', 'capital': 50000, 'net': True},
 }
 
