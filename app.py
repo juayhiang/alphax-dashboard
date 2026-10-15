@@ -187,6 +187,7 @@ STRATEGIES = {
     'VMA-FUNCTEST-1MIN'      : {'file': 'vma_1min_functest_trades.csv', 'color': '#fb7185', 'capital': 10000, 'net': True},
     'NSI-MID-001'            : {'file': 'nsi_mid_trades.csv',            'color': '#5eead4', 'capital': 150000, 'net': True},
     'MOM-SP100-V2'           : {'file': 'mom_v2_trades.csv',             'color': '#c4b5fd', 'capital': 50000, 'net': True},
+    'MOM-V2-FUNCTEST-1MIN'   : {'file': 'mom_v2_1min_functest_trades.csv', 'color': '#a78bfa', 'capital': 50000, 'net': True},
     'NSI-MID-FUNCTEST-1MIN'  : {'file': 'nsi_mid_1min_functest_trades.csv', 'color': '#2dd4bf', 'capital': 50000, 'net': True},
 }
 
@@ -221,6 +222,7 @@ EXTRA_COLS = {
     'OSR-SP500-001'        : ['role', 'score', 'beta', 'month'],
     'OSR-FUNCTEST-1MIN'    : ['role', 'score', 'beta', 'commission'],
     'NSI-MID-FUNCTEST-1MIN': ['role', 'score', 'beta', 'commission'],
+    'MOM-V2-FUNCTEST-1MIN' : ['role', 'score', 'beta', 'commission'],
     'VMA-FUNCTEST-1MIN'    : ['z_score', 'hedge_beta', 'exit_reason'],
 }
 
