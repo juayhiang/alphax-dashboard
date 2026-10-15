@@ -168,7 +168,7 @@ STRATEGIES = {
     'EPS-BCDC-001'    : {'file': 'eps_trades.csv',     'color': '#06b6d4', 'capital': 10000},
     'FSCORE-001'      : {'file': 'fscore_trades.csv',  'color': '#ec4899', 'capital': 10000},
     'HURST-001'            : {'file': 'hurst_trades.csv',        'color': '#84cc16', 'capital': 10000},
-    'INST-ACT-AVGDOWN-001' : {'file': 'inst_avgdown_trades.csv', 'color': '#f97316', 'capital':  5000},
+    'INST-ACT-AVGDOWN-001' : {'file': 'inst_avgdown_trades.csv', 'color': '#f97316', 'capital': 16000},   # per trade; 5,000 until 15 Oct 2026
     'SPY-NOLOSS-BUTTERFLY'   : {'file': 'spy_butterfly_trades.csv',     'color': '#22d3ee', 'capital': 10000, 'net': True},
     'SPY-NOLOSS-IRON-CONDOR' : {'file': 'spy_iron_condor_trades.csv',   'color': '#eab308', 'capital': 10000, 'net': True},
     # Market-neutral lane (Sep-Oct 2026 challenge): one row per leg / per position-month
