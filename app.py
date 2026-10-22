@@ -441,21 +441,6 @@ app.layout = html.Div(
 )
 
 # ── CALLBACKS ─────────────────────────────────────────────────────────────────
-@app.callback(
-    Output('last-updated',   'children'),
-    Output('marks-updated',  'children'),
-    Output('fetch-status',   'children'),
-    Output('cards-row1',     'children'),
-    Output('cards-row2',     'children'),
-    Output('cards-row3',     'children'),
-    Output('cards-bundles',  'children'),
-    Output('combined-card',  'children'),
-    Output('equity-chart',   'figure'),
-    Output('drawdown-chart', 'figure'),
-    Output('monthly-chart',  'figure'),
-    Output('strategy-bar',   'figure'),
-    Input('interval',        'n_intervals'),
-)
 def _stat_card(name, color, stats, unrealized, subtitle=None):
     """One strategy stat card (also used for bundle cards)."""
     pnl_color   = '#2ecc71' if stats['total_pnl'] >= 0 else '#e74c3c'
@@ -495,6 +480,23 @@ def _stat_card(name, color, stats, unrealized, subtitle=None):
     return card
 
 
+# 2026-10-22: the @app.callback below belongs to update_dashboard. It sat above _stat_card since 9 Oct (9837cee), so
+# Dash called the card helper -> TypeError -> HTTP 500 -> empty cards and charts. Keep helpers ABOVE this decorator.
+@app.callback(
+    Output('last-updated',   'children'),
+    Output('marks-updated',  'children'),
+    Output('fetch-status',   'children'),
+    Output('cards-row1',     'children'),
+    Output('cards-row2',     'children'),
+    Output('cards-row3',     'children'),
+    Output('cards-bundles',  'children'),
+    Output('combined-card',  'children'),
+    Output('equity-chart',   'figure'),
+    Output('drawdown-chart', 'figure'),
+    Output('monthly-chart',  'figure'),
+    Output('strategy-bar',   'figure'),
+    Input('interval',        'n_intervals'),
+)
 def update_dashboard(n):
     now        = datetime.now().strftime('%Y-%m-%d %H:%M SGT')
     all_trades = []
