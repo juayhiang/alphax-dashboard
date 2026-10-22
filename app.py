@@ -196,6 +196,9 @@ STRATEGIES = {
 BUNDLES = {
     'DTC+OSR PORTFOLIO (Strategy 6)'      : {'parts': ['DTC-SP500-001', 'OSR-SP500-001'],         'color': '#c084fc'},
     'DTC+OSR PORTFOLIO 1-MIN (Form 6 p.4)': {'parts': ['DTC-FUNCTEST-1MIN', 'OSR-FUNCTEST-1MIN'], 'color': '#e9d5ff'},
+    # 2026-10-22: Form 9 / trial #109 MN3 = OSR + NSI-MID + DTC (live paper books USD 250k + 150k + 50k; backtest 3 x 250k)
+    'MN3 PORTFOLIO OSR+NSI-MID+DTC (Form 9)'      : {'parts': ['OSR-SP500-001', 'NSI-MID-001', 'DTC-SP500-001'], 'color': '#f0abfc'},
+    'MN3 PORTFOLIO 1-MIN (Form 9 p.4)'            : {'parts': ['OSR-FUNCTEST-1MIN', 'NSI-MID-FUNCTEST-1MIN', 'DTC-FUNCTEST-1MIN'], 'color': '#fae8ff'},
 }
 
 # 'net': True = the bot's own dollar_pnl already has IBKR's actual commissions taken off (fill commissionReport).
