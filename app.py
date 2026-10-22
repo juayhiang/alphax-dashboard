@@ -204,6 +204,14 @@ BUNDLES = {
 # 'net': True = the bot's own dollar_pnl already has IBKR's actual commissions taken off (fill commissionReport).
 # Every other strategy is converted to net P&L at load time by ibkr_costs.apply_ibkr_costs().
 
+# 2026-10-22: retired / functional-test bots -- still listed and in the trade log, hidden by default on the two charts.
+RETIRED = {'MOM-SP100-001', 'VMA-PAIRS-HOURLY'}
+
+
+def _is_retired(name):
+    return 'FUNCTEST' in name or name in RETIRED
+
+
 # Columns to show in trade table per strategy (extra signal columns)
 EXTRA_COLS = {
     'NOPE-EOD-001' : ['z_score', 'eod_nope'],
@@ -552,10 +560,13 @@ def update_dashboard(n):
                 plot_dates.append(marks_as_of)
                 plot_eq.append(eq[-1] + unrealized)
 
+            # 2026-10-22: plotted as % return on each bot's own capital (USD 10k-250k books made the USD chart unreadable);
+            # retired test bots start hidden (click the legend to show them).
+            vis = 'legendonly' if _is_retired(name) else True
             eq_fig.add_trace(go.Scatter(
-                x=plot_dates, y=plot_eq, name=name,
+                x=plot_dates, y=[100 * (v - capital) / capital for v in plot_eq], name=name, visible=vis,
                 line=dict(color=color, width=2),
-                hovertemplate='%{x}<br>$%{y:,.2f}<extra>' + name + '</extra>'
+                hovertemplate='%{x}<br>%{y:+.2f}%<extra>' + name + '</extra>'
             ))
             pnl_arr = pd.to_numeric(df['dollar_pnl'], errors='coerce').fillna(0).values
             cum     = np.cumsum(pnl_arr)
@@ -564,9 +575,9 @@ def update_dashboard(n):
             peak    = np.maximum.accumulate(cum)
             dd_arr  = cum - peak
             dd_fig.add_trace(go.Scatter(
-                x=plot_dates, y=dd_arr.tolist(), name=name,
-                fill='tozeroy', line=dict(color=color, width=1),
-                hovertemplate='%{x}<br>$%{y:,.2f}<extra>' + name + '</extra>'
+                x=plot_dates, y=(100 * dd_arr / capital).tolist(), name=name, visible=vis,
+                line=dict(color=color, width=1.5),
+                hovertemplate='%{x}<br>%{y:.2f}% of capital<extra>' + name + '</extra>'
             ))
 
         if not df.empty:
@@ -592,12 +603,13 @@ def update_dashboard(n):
                                        subtitle=f'capital ${bcap:,.0f} | trades: {split}'))
 
     # ── Equity chart layout ──────────────────────────────────────────────────
-    _dark_layout(eq_fig, yprefix='$')
-    eq_fig.add_hline(y=10000, line_dash='dash', line_color='#8b949e',
-                     annotation_text='Capital $10k')
+    _dark_layout(eq_fig, ysuffix='%')
+    eq_fig.update_layout(hovermode='closest')
+    eq_fig.add_hline(y=0, line_dash='dash', line_color='#8b949e', annotation_text='break-even')
 
     # ── Drawdown chart layout ────────────────────────────────────────────────
-    _dark_layout(dd_fig, yprefix='$')
+    _dark_layout(dd_fig, ysuffix='%')
+    dd_fig.update_layout(hovermode='closest')
 
     # ── Combined card ────────────────────────────────────────────────────────
     combined_card = html.Div()
@@ -787,14 +799,14 @@ def update_table(strategy_filter, n):
 
 
 # ── SHARED LAYOUT HELPER ──────────────────────────────────────────────────────
-def _dark_layout(fig, yprefix=''):
+def _dark_layout(fig, yprefix='', ysuffix=''):
     fig.update_layout(
         paper_bgcolor='#161b22', plot_bgcolor='#0d1117',
         font=dict(color='#e6edf3'),
         legend=dict(bgcolor='#161b22', bordercolor='#30363d'),
         xaxis=dict(gridcolor='#21262d'),
         yaxis=dict(gridcolor='#21262d',
-                   tickprefix=yprefix if yprefix else ''),
+                   tickprefix=yprefix if yprefix else '', ticksuffix=ysuffix),
         hovermode='x unified',
         margin=dict(l=55, r=20, t=20, b=40),
     )
