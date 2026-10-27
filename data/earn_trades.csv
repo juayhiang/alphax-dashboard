@@ -1,4 +1,5 @@
 ticker,direction,shares,entry_date,target_exit,est_entry,stop,tp,order_id,status,source,exit_date,exit_price,dollar_pnl
+XYL,SHORT,99,2026-10-27,2026-11-24,100.7,108.54,80.4,1089,open,premarket,,,
 PH,LONG,9,2026-08-06,2026-08-07,1081.1211,994.52,1297.2,756,closed,premarket,2026-08-07,1070.89,-93.39
 DDOG,SHORT,42,2026-08-06,2026-08-07,227.6787,256.55,190.04,761,closed,premarket,2026-08-11,251.7,-1009.98
 PODD,SHORT,76,2026-08-05,2026-08-06,127.9826,141.2,104.59,711,closed,premarket,2026-08-06,131.14,-241.06
@@ -23,4 +24,3 @@ TPR,SHORT,77,2026-08-13,2026-08-14,129.0,139.32,103.2,935,cancelled,premarket,20
 EL,LONG,104,2026-08-19,2026-08-20,95.66,88.01,114.79,1077,cancelled,premarket,2026-08-19,,0.0
 ACN,LONG,46,2026-10-01,2026-10-29,215.88,198.61,259.06,977,cancelled,premarket,2026-10-01,,0.0
 STT,SHORT,63,2026-10-14,2026-11-11,157.0,169.56,125.6,1157,closed,premarket,2026-10-16,169.71,-803.13
-XYL,SHORT,99,2026-10-27,2026-11-24,100.5,108.54,80.4,1089,pending_open,premarket,,,
