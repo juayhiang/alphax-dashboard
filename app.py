@@ -189,6 +189,8 @@ STRATEGIES = {
     'MOM-SP100-V2'           : {'file': 'mom_v2_trades.csv',             'color': '#c4b5fd', 'capital': 50000, 'net': True},
     'MOM-V2-FUNCTEST-1MIN'   : {'file': 'mom_v2_1min_functest_trades.csv', 'color': '#a78bfa', 'capital': 50000, 'net': True},
     'NSI-MID-FUNCTEST-1MIN'  : {'file': 'nsi_mid_1min_functest_trades.csv', 'color': '#2dd4bf', 'capital': 50000, 'net': True},
+    # Nov 2026 round: GEX-gated QQQ/IWM weekly put spreads (submission GEXPUT-QQQ-IWM); one row per spread, P&L net of IBKR commissions
+    'GEXPUT-001'             : {'file': 'gexput_trades.csv',             'color': '#38bdf8', 'capital': 100000, 'net': True},
 }
 
 # Strategy bundles: a submitted strategy made of several bots (no bot of its own). Display only -- a bundle card sums its
@@ -235,6 +237,7 @@ EXTRA_COLS = {
     'NSI-MID-FUNCTEST-1MIN': ['role', 'score', 'beta', 'commission'],
     'MOM-V2-FUNCTEST-1MIN' : ['role', 'score', 'beta', 'commission'],
     'VMA-FUNCTEST-1MIN'    : ['z_score', 'hedge_beta', 'exit_reason'],
+    'GEXPUT-001'           : ['expiry', 'K_short', 'K_long', 'spx_gex', 'exit_reason'],
 }
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
