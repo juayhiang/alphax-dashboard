@@ -190,7 +190,7 @@ STRATEGIES = {
     'MOM-V2-FUNCTEST-1MIN'   : {'file': 'mom_v2_1min_functest_trades.csv', 'color': '#a78bfa', 'capital': 50000, 'net': True},
     'NSI-MID-FUNCTEST-1MIN'  : {'file': 'nsi_mid_1min_functest_trades.csv', 'color': '#2dd4bf', 'capital': 50000, 'net': True},
     # Nov 2026 round: GEX-gated QQQ/IWM weekly put spreads (submission GEXPUT-QQQ-IWM); one row per spread, P&L net of IBKR commissions
-    'GEXPUT-001'             : {'file': 'gexput_trades.csv',             'color': '#38bdf8', 'capital': 100000, 'net': True},
+    'GEXPUT-001'             : {'file': 'gexput_trades.csv',             'color': '#38bdf8', 'capital': 10000, 'net': True},
     # Nov 2026 round: long new spin-offs / short IWM, 6-month hold (submission SPINOFF-IWM); one row per leg, P&L net of IBKR commissions
     'SPINOFF-001'            : {'file': 'spinoff_trades.csv',            'color': '#f472b6', 'capital': 100000, 'net': True},
 }
