@@ -1,0 +1,3 @@
+row_id,ticker,direction,role,shares,entry_date,entry_time,expiry,K_short,K_long,delta_short,credit_natural,credit_mid,est_entry,entry_commission,exit_date,exit_time,exit_price,exit_commission,dollar_pnl,status
+2026-11-04-QQQ-20261109,QQQ,SHORT,PUT SPREAD,1,2026-11-04,13:01:02,20261109,676.0,662.0,-0.1499,1.04,1.065,1.06,1.35,,,,,,open
+2026-11-04-IWM-20261109,IWM,SHORT,PUT SPREAD,1,2026-11-04,13:02:06,20261109,278.0,272.0,-0.15,0.35,0.37,0.36,1.35,,,,,,open
