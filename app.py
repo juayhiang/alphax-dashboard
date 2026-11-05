@@ -195,6 +195,12 @@ STRATEGIES = {
     'SPINOFF-001'            : {'file': 'spinoff_trades.csv',            'color': '#f472b6', 'capital': 100000, 'net': True},
     # 2026-11-03 functional test of SPINOFF-IWM (spin-offs vs VTWO, opened 10:00 ET, closed 15:50 ET); one row per leg
     'SPINOFF-FUNCTEST-1DAY'  : {'file': 'spinoff_functest_trades.csv',   'color': '#f9a8d4', 'capital': 30000,  'net': True},
+    # 2026-11-04 functional test of GEXPUT-QQQ-IWM (no gate, sold 13:00 ET, bought back 14:30 ET); one row per spread
+    'GEXPUT-FUNCTEST-1DAY'   : {'file': 'gexput_functest_trades.csv',    'color': '#7dd3fc', 'capital': 10000,  'net': True},
+    # Nov 2026 round: long 100 TLT over the last 3 sessions of each month (submission MONTHEND-TLT); first rule trade 24-30 Nov 2026
+    'MONTHEND-TLT-001'       : {'file': 'monthend_tlt_trades.csv',       'color': '#fde047', 'capital': 10000,  'net': True},
+    # 2026-11-04 functional test of MONTHEND-TLT (100 TLT bought 10:00 ET, sold 15:50 ET the same day; not the rule timing)
+    'MONTHEND-TLT-FUNCTEST-1DAY': {'file': 'monthend_tlt_functest_trades.csv', 'color': '#fef08a', 'capital': 10000, 'net': True},
 }
 
 # Strategy bundles: a submitted strategy made of several bots (no bot of its own). Display only -- a bundle card sums its
