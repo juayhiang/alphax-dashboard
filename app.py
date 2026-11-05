@@ -201,6 +201,8 @@ STRATEGIES = {
     'MONTHEND-TLT-001'       : {'file': 'monthend_tlt_trades.csv',       'color': '#fde047', 'capital': 10000,  'net': True},
     # 2026-11-04 functional test of MONTHEND-TLT (100 TLT bought 10:00 ET, sold 15:50 ET the same day; not the rule timing)
     'MONTHEND-TLT-FUNCTEST-1DAY': {'file': 'monthend_tlt_functest_trades.csv', 'color': '#fef08a', 'capital': 10000, 'net': True},
+    'DESPAC-001'             : {'file': 'despac_trades.csv',             'color': '#fb923c', 'capital': 100000, 'net': True},
+    'DESPAC-FUNCTEST-1DAY'   : {'file': 'despac_functest_trades.csv',    'color': '#fdba74', 'capital': 20000,  'net': True},
 }
 
 # Strategy bundles: a submitted strategy made of several bots (no bot of its own). Display only -- a bundle card sums its
@@ -249,6 +251,7 @@ EXTRA_COLS = {
     'VMA-FUNCTEST-1MIN'    : ['z_score', 'hedge_beta', 'exit_reason'],
     'GEXPUT-001'           : ['expiry', 'K_short', 'K_long', 'spx_gex', 'exit_reason'],
     'SPINOFF-001'          : ['role', 'pair_id', 'planned_exit', 'catch_up'],
+    'DESPAC-001'           : ['role', 'pair_id', 'planned_exit', 'catch_up'],
     'SPINOFF-FUNCTEST-1DAY': ['role', 'pair_id', 'entry_time', 'exit_time'],
 }
 
