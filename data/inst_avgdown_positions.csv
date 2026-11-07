@@ -1,5 +1,5 @@
 ticker,direction,shares,entry_date,target_exit,est_entry,stop_price,order_id,status,discount_pct,institution,exit_date,exit_price,dollar_pnl,exit_order_id
-FAST,,296,2026-10-30,2026-11-19,52.99,51.4,1132.0,closed,18.9,PROSHARE ADVISORS LLC,2026-11-06,53.0,2.96,1266.0
+FAST,,296,2026-10-30,2026-11-19,52.99,51.4,1132.0,closed,18.9,PROSHARE ADVISORS LLC,2026-11-06,53.0,-0.62,1266.0
 PFE,,515,2026-11-05,2026-11-25,31.02,,1148.0,cancelled,19.8,DIMENSIONAL FUND ADVISORS LP,2026-11-05,,0.0,
 ACN,,59,2026-11-05,2026-11-25,267.4,,1151.0,cancelled,16.9,CITIGROUP INC,2026-11-05,,0.0,
 UPS,,140,2026-11-05,2026-11-25,113.99,,1154.0,cancelled,12.4,DIMENSIONAL FUND ADVISORS LP,2026-11-05,,0.0,
