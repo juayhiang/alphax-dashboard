@@ -1,1 +1,2 @@
-
+row_id,ticker,direction,role,shares,entry_date,est_entry,expiry,K_short,K_long,max_loss,signal_date,spx_gex,entry_commission,exit_date,exit_price,exit_reason,exit_commission,dollar_pnl,status
+2026-11-12-IWM-20261117,IWM,SHORT,PUT SPREAD,1,2026-11-12,0.38,20261117,273.0,267.0,564.3,2026-11-11,4138.550899999999,1.74,,,,,,open
