@@ -1,0 +1,2 @@
+row_id,ticker,direction,shares,entry_date,est_entry,planned_exit,exit_date,exit_price,dollar_pnl,status,entry_commission,exit_commission
+TLT-2026-11-24,TLT,LONG,100,2026-11-24,81.49,2026-11-30,,,,open,1.09,
